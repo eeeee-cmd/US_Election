@@ -80,8 +80,9 @@ This model was chosen for its balance between simplicity and predictive power. L
 library(tidyverse)
 library(dplyr)
 library(here)
+library(arrow)
 
-cleaned_data <- read_csv(here::here("data/analysis_data/model_data.csv"))
+cleaned_data <- read_parquet(here::here("data/analysis_data/model_data.parquet"))
 lm_model <- readRDS(here::here("models/lm_model.rds"))
 
 cleaned_data <- cleaned_data %>%
@@ -109,8 +110,9 @@ print(results)
 
 library(tidyverse)
 library(here)
+library(arrow)
 
-cleaned_data <- read_csv(here::here("data/analysis_data/electoral_data.csv"))
+cleaned_data <- read_parquet(here::here("data/analysis_data/electoral_data.parquet"))
 lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
 lm_model_harris <- readRDS(here::here("models/lm_model_harris.rds"))
 
@@ -208,7 +210,7 @@ The model results (see Appendix for details) show a clear distribution of suppor
 #| eval: true
 #| warning: false
 #| message: false
-cleaned_data <- read_csv(here::here("data/analysis_data/president_polls_cleaned.csv"))
+cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet"))
 
 summary_stats <- cleaned_data %>%
   summarise(
