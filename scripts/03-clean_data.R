@@ -5,12 +5,13 @@
 # Date: October 22nd, 2024
 # Contact: sophia.brothers@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` and 'here' package must be installed
+# Pre-requisites: The `tidyverse`, 'here', and 'arrow' packages must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
 # load libraries
 library(tidyverse)
 library(here)
+library(arrow)
 
 # read data
 data <- read_csv(here::here("data/raw_data/president_polls.csv"))
@@ -79,7 +80,8 @@ cleaned_data <- tryCatch(
 # save cleaned data as new csv if successful, print error if not
 if (!is.null(cleaned_data)) {
   write_csv(cleaned_data, here::here("data/analysis_data/president_polls_cleaned.csv"))
-
+  write_parquet(cleaned_data, here::here("data/analysis_data/president_polls_cleaned.parquet"))
+  
   print(head(cleaned_data))
 } else {
   message("Cleaned data not available for saving due to an error.")
