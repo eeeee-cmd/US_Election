@@ -1,0 +1,222 @@
+---
+title: "Modeling the 2024 US Presidential Elections"
+subtitle: "My subtitle if needed"
+author: 
+  - Sophia Brothers
+  - Deyi Kong
+thanks: "Code and data are available at: [https://github.com/eeeee-cmd/US_Election/](https://github.com/eeeee-cmd/US_Election/)."
+date: today
+date-format: long
+abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+format: pdf
+number-sections: true
+bibliography: references.bib
+---
+
+# Introduction
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+# Data
+
+## Overview
+
+This data was analyzed using [@citeR]. We also used the packages: tidyverse [@tidyverse], etc
+
+## Measurement
+
+## Outcome Variables
+
+## Predictor Variables
+
+# Model
+
+## Model Set-Up
+
+## Model Justification
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+library(tidyverse)
+library(dplyr)
+library(here)
+
+cleaned_data <- read_csv(here::here("data/analysis_data/model_data.csv"))
+lm_model <- readRDS(here::here("models/lm_model.rds"))
+
+cleaned_data <- cleaned_data %>%
+  mutate(PredictedPercentage = predict(lm_model, newdata = cleaned_data))
+
+results <- cleaned_data %>%
+  group_by(CandidateName) %>%
+  summarise(AveragePredictedPercentage = mean(PredictedPercentage, na.rm = TRUE)) %>%
+  arrange(desc(AveragePredictedPercentage)) %>%
+  filter(AveragePredictedPercentage > 0)
+
+total_percentage <- sum(results$AveragePredictedPercentage, na.rm = TRUE)
+
+results <- results %>%
+  mutate(NormalizedPercentage = (AveragePredictedPercentage / total_percentage) * 100)
+
+print(results)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(here)
+
+cleaned_data <- read_csv(here::here("data/analysis_data/electoral_data.csv"))
+lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
+lm_model_harris <- readRDS(here::here("models/lm_model_harris.rds"))
+
+unique_states <- distinct(cleaned_data, State)
+
+prediction_data <- cleaned_data %>%
+  group_by(State) %>%
+  summarise(
+    PollScore = mean(PollScore, na.rm = TRUE),
+    SampleSize = mean(SampleSize, na.rm = TRUE),
+    NumericGrade = mean(NumericGrade, na.rm = TRUE),
+    PollRecency = mean(PollRecency, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+prediction_data <- prediction_data %>%
+  mutate(
+    TrumpPredicted = predict(lm_model_trump, newdata = prediction_data),
+    HarrisPredicted = predict(lm_model_harris, newdata = prediction_data)
+  )
+
+electoral_votes <- tibble(
+  State = c("Alabama", "Kentucky", "North Dakota", "Alaska", "Louisiana", 
+            "Ohio", "Arizona", "Maine", "Oklahoma", "Arkansas", 
+            "Maryland", "Oregon", "California", "Massachusetts", "Pennsylvania", 
+            "Colorado", "Michigan", "Rhode Island", "Connecticut", "Minnesota", 
+            "South Carolina", "Delaware", "Mississippi", "South Dakota", 
+            "District of Columbia", "Missouri", "Tennessee", "Florida", 
+            "Montana", "Texas", "Georgia", "Nebraska", "Utah", 
+            "Hawaii", "Nevada", "Vermont", "Idaho", "New Hampshire", 
+            "Virginia", "Illinois", "New Jersey", "Washington", 
+            "Indiana", "New Mexico", "West Virginia", "Iowa", 
+            "New York", "Wisconsin", "Kansas", "North Carolina", 
+            "Wyoming"),
+  Votes = c(9, 8, 3, 3, 8, 
+            17, 11, 4, 7, 6, 
+            10, 8, 54, 11, 19, 
+            10, 15, 4, 7, 10, 
+            9, 3, 6, 3, 
+            3, 10, 11, 30, 
+            4, 40, 16, 5, 6, 
+            4, 6, 3, 4, 4, 
+            13, 19, 14, 12, 
+            11, 5, 4, 6, 
+            28, 10, 6, 16, 
+            3)
+)
+
+predictions_with_votes <- prediction_data %>%
+  left_join(electoral_votes, by = "State")
+
+predictions_with_votes <- predictions_with_votes %>%
+  mutate(
+    Winner = case_when(
+      TrumpPredicted > HarrisPredicted ~ "Donald Trump",
+      HarrisPredicted > TrumpPredicted ~ "Kamala Harris",
+      TRUE ~ "Tie"
+    ),
+    TrumpElectoralVotes = if_else(Winner == "Donald Trump", Votes, 0),
+    HarrisElectoralVotes = if_else(Winner == "Kamala Harris", Votes, 0)
+  )
+
+electoral_totals <- predictions_with_votes %>%
+  summarise(
+    TrumpTotalElectoralVotes = sum(TrumpElectoralVotes, na.rm = TRUE),
+    HarrisTotalElectoralVotes = sum(HarrisElectoralVotes, na.rm = TRUE)
+  )
+
+print(electoral_totals)
+
+state_winners <- predictions_with_votes %>%
+  select(State, TrumpPredicted, HarrisPredicted) %>%
+  mutate(
+    Winner = case_when(
+      TrumpPredicted > HarrisPredicted ~ "Donald Trump",
+      HarrisPredicted > TrumpPredicted ~ "Kamala Harris",
+      TRUE ~ "Tie"
+    )
+  )
+
+print(state_winners, n=54)
+
+
+```
+
+# Results
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+cleaned_data <- read_csv(here::here("data/analysis_data/president_polls_cleaned.csv"))
+
+summary_stats <- cleaned_data %>%
+  summarise(
+    AveragePollScore = mean(PollScore, na.rm = TRUE),
+    AverageSampleSize = mean(SampleSize, na.rm = TRUE),
+    AveragePercentage = mean(Percentage, na.rm = TRUE),
+    TotalPolls = n()
+  )
+
+print(summary_stats)
+
+ggplot(cleaned_data, aes(x = PollScore)) +
+  geom_histogram(bins = 30, fill = "blue", alpha = 0.7) +
+  labs(title = "Distribution of Poll Scores", x = "Poll Score", y = "Frequency")
+
+ggplot(cleaned_data, aes(x = SampleSize)) +
+  geom_histogram(bins = 30, fill = "green", alpha = 0.7) +
+  labs(title = "Distribution of Sample Size", x = "Sample Size", y = "Frequency")
+
+ggplot(cleaned_data, aes(x = Percentage)) +
+  geom_histogram(bins = 30, fill = "orange", alpha = 0.7) +
+  labs(title = "Distribution of Percentage", x = "Percentage", y = "Frequency")
+
+ggplot(cleaned_data, aes(x = CandidateName, y = Percentage)) +
+  geom_boxplot() +
+  labs(title = "Percentage by Candidate", x = "Candidate", y = "Percentage") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(cleaned_data, aes(x = State, y = Percentage)) +
+  geom_boxplot() +
+  labs(title = "Percentage by State", x = "State", y = "Percentage") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+numerical_data <- cleaned_data %>%
+  select(PollScore, SampleSize, Percentage)
+
+correlation_matrix <- cor(numerical_data, use = "complete.obs")
+
+library(ggcorrplot)
+ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
+```
+
+# Discussion
+
+# Appendix
+
+## Additional Data Details
+
+## Model Details {#sec-model-details}
+
+\newpage
+
+# References

@@ -1,54 +1,51 @@
 #### Preamble ####
-# Purpose: Simulates a dataset of Australian electoral divisions, including the 
-  #state and party that won each division.
-# Author: Deyi Kong
-# Date: 17 October 2024
-# Contact: deyi.kong@mail.utoronto.ca
+# Purpose: 
+# Author: Sophia Brothers
+# Date: 
+# Contact: 
 # License: MIT
 # Pre-requisites: The `tidyverse` package must be installed
-# Any other information needed? Make sure you are in the `election_folder` rproj
+# Any other information needed?
 
+library(dplyr)
 
-#### Workspace setup ####
-library(tidyverse)
-set.seed(777)
+set.seed(123)
+pollster_ids <- c(1001, 1002, 1003, 1004)
+pollsters <- c("Pollster A", "Pollster B", "Pollster C", "Pollster D")
+sponsors <- c("Sponsor 1", "Sponsor 2", "Sponsor 3")
+states <- c("Florida", "Ohio", "Texas", "Georgia", "Arizona", "California")
+methodologies <- c("Phone", "Online", "Mixed")
+candidates <- c("Candidate 1", "Candidate 2", "Candidate 3")
+candidate_parties <- c("Party A", "Party B", "Party C")
+population_types <- c("Registered Voters", "Likely Voters", "Adults")
+n <- 100 
 
+start_dates <- sample(seq(as.Date('2024-01-01'), as.Date('2024-12-31'), by = "day"), n, replace = TRUE)
+end_dates <- start_dates + sample(1:30, n, replace = TRUE)
 
-#### Simulate data ####
-# Top 10 population States names
-states <- c(
-  "California",
-  "Texas",
-  "Florida",
-  "New York",
-  "Pennsylvania",
-  "Illinois",
-  "Ohio",
-  "Georgia",
-  "North Carolina",
-  "Michigan"
+poll_data <- data.frame(
+  poll_id = 1:n,
+  pollster_id = sample(pollster_ids, n, replace = TRUE),
+  pollster = sample(pollsters, n, replace = TRUE),
+  sponsor_ids = sample(1:3, n, replace = TRUE),
+  sponsors = sample(sponsors, n, replace = TRUE),
+  pollster_rating_id = sample(1:5, n, replace = TRUE),
+  numeric_grade = round(runif(n, 2, 5), 2),
+  pollscore = round(runif(n, 60, 100), 2),
+  methodology = sample(methodologies, n, replace = TRUE),
+  state = sample(states, n, replace = TRUE),
+  start_date = start_dates,
+  end_date = end_dates,
+  sponsor_candidate = sample(candidates, n, replace = TRUE),
+  sponsor_candidate_party = sample(candidate_parties, n, replace = TRUE),
+  endorsed_candidate_name = sample(candidates, n, replace = TRUE),
+  endorsed_candidate_party = sample(candidate_parties, n, replace = TRUE),
+  sample_size = sample(500:2000, n, replace = TRUE),
+  population = sample(population_types, n, replace = TRUE),
+  election_date = sample(seq(as.Date('2024-11-01'), as.Date('2024-11-08'), by="day"), n, replace = TRUE),
+  stage = sample(c("Primary", "General"), n, replace = TRUE),
+  candidate_name = sample(candidates, n, replace = TRUE),
+  pct = round(runif(n, 30, 60), 2)
 )
 
-# Political parties
-parties <- c("Republican", "Democratic", "Libertarians", "Constitution", "Greens", "Natural Law")
-
-# Create a dataset by randomly assigning states and parties to divisions
-analysis_data <- tibble(
-  division = paste("Division", 1:151),  # Add "Division" to make it a character
-  state = sample(
-    states,
-    size = 151,
-    replace = TRUE,
-    prob = c(0.25, 0.25, 0.15, 0.15, 0.15, 0.1, 0.1, 0.1, 0.025, 0.025) # Rough state population distribution
-  ),
-  party = sample(
-    parties,
-    size = 151,
-    replace = TRUE,
-    prob = c(0.40, 0.40, 0.05, 0.1, 0.1, 0.05) # Rough party distribution
-  )
-)
-
-
-#### Save data ####
-write_csv(analysis_data, "data/00-simulated_data/simulated_data.csv")
+write_csv(cleaned_data, here::here("data/simulated_data/simulated_data.csv"))

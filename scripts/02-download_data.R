@@ -1,20 +1,13 @@
 #### Preamble ####
-# Purpose: Downloads and saves the data from https://projects.fivethirtyeight.com/polls/president-general/2024/national/
-# Author: Deyi Kong
-# Date: 17 October 2024
-# Contact: deyi.kong@mail.utoronto.ca
+# Purpose: 
+# Author: Sophia Brothers
+# Date: 
+# Contact: 
 # License: MIT
-# Pre-requisites: The `tidyverse` package must be installed and loaded
-# Any other information needed? Make sure you are in the `election_folder` rproj
+# Pre-requisites: The `tidyverse` package must be installed
+# Any other information needed?
 
 
-#### Workspace setup ####
-library(tidyverse)
+library(readr)
 
-#### Download data ####
-data <- read.csv("/Users/a._./Downloads/president_polls.csv")
-
-#### Save data ####
-write_csv(data, "data/01-raw_data/raw_data.csv") 
-
-         
+data <- read_csv(here::here("data/raw_data/president_polls.csv"))
