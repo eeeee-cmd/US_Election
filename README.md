@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository provides readers with all the necessary data, R scripts, and files to understand and reproduce a prediction on United State Presidential Election.
+This repository provides readers with all the necessary data, R scripts, and files to understand and reproduce a prediction on United States Presidential Election.
 
 The data used in this analysis comes from a combination of publicly available polling data for the 2024 U.S. Presidential election. The analysis leverages R and several libraries. The dataset covers various polls conducted across multiple states, capturing the support for each major candidate—Donald Trump and Kamala Harris—along with detailed attributes of the polls.
 
@@ -22,4 +22,4 @@ The repo is structured as:
 
 ## Statement on LLM usage
 
-LLMs are currently not used in this analysis in any way. If any, the entire chat history is available in other/llms/usage.txt.
+LLMs are currently not used in this analysis in any way. If any end up being used, the chat history will be available in other/llms/usage.txt.
