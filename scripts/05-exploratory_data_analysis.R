@@ -4,7 +4,7 @@
 # Date:
 # Contact:
 # License: MIT
-# Pre-requisites: The `tidyverse`, 'janitor', 'here', and 'reshape2' packages
+# Pre-requisites: The `tidyverse`, 'janitor', 'here', 'arrow', and 'reshape2' packages
 # must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
@@ -13,9 +13,10 @@ library(tidyverse)
 library(janitor)
 library(here)
 library(reshape2)
+library(arrow)
 
 # read cleaned data
-cleaned_data <- read_csv(here::here("data/analysis_data/president_polls_cleaned.csv")) |>
+cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet")) |>
   clean_names()
 
 # quick overview of data structure
