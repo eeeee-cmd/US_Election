@@ -1,18 +1,22 @@
 #### Preamble ####
-# Purpose: 
+# Purpose: This script performs a series of validation tests on cleaned presidential polling data.
 # Author: Sophia Brothers
-# Date: 
-# Contact: 
+# Date: October 22nd, 2024
+# Contact: sophia.brothers@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` package must be installed
-# Any other information needed?
+# Pre-requisites: The `tidyverse` and 'here' package must be installed
+# Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
+# load libraries
 library(tidyverse)
 library(here)
 
+# load data
 cleaned_data <- read_csv(here::here("data/analysis_data/president_polls_cleaned.csv"))
 
+# define list of tests
 tests <- list(
+  # test structure of data
   structure_test = function(data) {
     if (!inherits(data, "tbl_df")) {
       stop("Structure test failed: Data is not a tibble.")
@@ -25,72 +29,66 @@ tests <- list(
     }
     cat("Structure test passed.\n")
   },
-  
+  # test if column names match expected names
   column_names_test = function(data) {
-    expected_colnames <- c("poll_id", "pollster_id", "Pollster", "Party", "sponsors", 
-                           "NumericGrade", "PollScore", "Methodology", 
-                           "State", "StartDate", "EndDate", 
-                           "SampleSize", "Population", "ElectionDate", 
-                           "Stage", "CandidateName", "Percentage")
-    
+    expected_colnames <- c(
+      "poll_id", "pollster_id", "Pollster", "Party", "sponsors",
+      "NumericGrade", "PollScore", "Methodology",
+      "State", "StartDate", "EndDate",
+      "SampleSize", "Population", "ElectionDate",
+      "Stage", "CandidateName", "Percentage"
+    )
+
     if (!all(names(data) == expected_colnames)) {
       stop("Column names test failed: Column names do not match expected names.")
     }
     cat("Column names test passed.\n")
   },
-  
+  # test if certain columns contain NA values
   na_values_test = function(data) {
-    if (any(is.na(data$pollscore))) {
-      stop("NA values test failed: pollscore contains NA values.")
+    if (any(is.na(data$Percentage))) {
+      stop("NA values test failed: Percentage contains NA values.")
     }
-    if (any(is.na(data$candidate_name))) {
-      stop("NA values test failed: candidate_name contains NA values.")
+    if (any(is.na(data$CandidateName))) {
+      stop("NA values test failed: CandidateName contains NA values.")
     }
     cat("NA values test passed.\n")
   },
-  
+  # test if any numeric grades or pollscores are out of expected range
   numeric_grade_pollscore_test = function(data) {
-    if (any(data$numeric_grade < 2 | data$numeric_grade > 5)) {
-      stop("Numeric grade test failed: numeric_grade is out of expected range.")
+    if (any(data$NumericGrade < 0 | data$NumericGrade > 3, na.rm = TRUE)) {
+      stop("Numeric grade test failed: NumericGrade is out of expected range.")
     }
-    if (any(data$pollscore < 60 | data$pollscore > 100)) {
-      stop("Pollscore test failed: pollscore is out of expected range.")
+    if (any(data$PollScore < -2 | data$PollScore > 2, na.rm = TRUE)) {
+      stop("Pollscore test failed: PollScore is out of expected range.")
     }
     cat("Numeric grade and pollscore test passed.\n")
   },
-  
+  # test if sample size is out of expected range
   sample_size_test = function(data) {
-    if (any(data$sample_size < 500 | data$sample_size > 2000)) {
+    if (any(data$SampleSize < 100 | data$SampleSize > 30000, na.rm = TRUE)) {
       stop("Sample size test failed: sample_size is out of expected range.")
     }
     cat("Sample size test passed.\n")
   },
-  
+  # test if start date is before end date
   date_logic_test = function(data) {
-    if (any(data$start_date >= data$end_date)) {
-      stop("Date logic test failed: start_date is not before end_date.")
+    if (any(data$StartDate > data$EndDate, na.rm = TRUE)) {
+      stop("Date logic test failed: StartDate is not before EndDate")
     }
     cat("Date logic test passed.\n")
   },
-  
+  # test if election date is within range
   election_date_test = function(data) {
-    if (any(data$election_date < as.Date('2024-11-01') | data$election_date > as.Date('2024-11-08'))) {
-      stop("Election date test failed: election_date is out of expected range.")
+    if (any(data$ElectionDate < as.Date("2024-11-01") | data$ElectionDate > as.Date("2024-11-08"))) {
+      stop("Election date test failed: ElectionDate is out of expected range.")
     }
     cat("Election date test passed.\n")
-  },
-  
-  candidate_parties_test = function(data) {
-    valid_candidates <- c("Candidate 1", "Candidate 2", "Candidate 3")
-    if (any(!data$candidate_name %in% valid_candidates)) {
-      stop("Candidate parties test failed: candidate_name contains invalid candidates.")
-    }
-    cat("Candidate parties test passed.\n")
   }
 )
 
 run_tests <- function(data) {
-  walk(tests, ~ .x(data))  
+  walk(tests, ~ .x(data))
   cat("All tests completed successfully!\n")
 }
 
