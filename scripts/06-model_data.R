@@ -4,15 +4,16 @@
 # Date: October 22nd, 2024
 # Contact: sophia.brothers@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` and 'here' packages must be installed
+# Pre-requisites: The `tidyverse`, 'here', and 'arrow' packages must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
 # load libraries
 library(tidyverse)
 library(here)
+library(arrow)
 
 # load data
-cleaned_data <- read_csv(here::here("data/analysis_data/president_polls_cleaned.csv"))
+cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet"))
 
 # convert some columns to the appropriate data types
 cleaned_data <- cleaned_data %>%
@@ -47,6 +48,7 @@ lm_model <- lm(
 # summary of model
 summary(lm_model)
 
-# save modified data for the model as a CSV and save model as RDS
+# save modified data for the model as a CSV + Parquet and save model as RDS
 write_csv(cleaned_data, here::here("data/analysis_data/model_data.csv"))
+write_parquet(cleaned_data, here::here("data/analysis_data/model_data.parquet"))
 saveRDS(lm_model, here::here("models/lm_model.rds"))
