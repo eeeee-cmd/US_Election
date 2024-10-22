@@ -4,15 +4,16 @@
 # Date: October 22nd, 2024
 # Contact: sophia.brothers@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` and 'here' package must be installed
+# Pre-requisites: The `tidyverse`, 'here', and 'arrow' packages must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
 # load libraries
 library(tidyverse)
 library(here)
+library(arrow)
 
 # load data
-cleaned_data <- read_csv(here::here("data/analysis_data/president_polls_cleaned.csv"))
+cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet"))
 
 # define list of tests
 tests <- list(
