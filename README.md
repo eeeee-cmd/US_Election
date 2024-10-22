@@ -1,4 +1,4 @@
-# US_Election
+# Trump vs. Harris: A Data-Driven Forecast modeling the 2024 US Presidential Elections
 
 ## Overview
 
