@@ -3,6 +3,7 @@ title: "Trump vs. Harris: A Data-Driven Forecast modeling the 2024 US Presidenti
 author: 
   - Sophia Brothers
   - Deyi Kong
+  - Rayan Awad Alim
 thanks: "Code and data are available at: [https://github.com/eeeee-cmd/US_Election/](https://github.com/eeeee-cmd/US_Election/)."
 date: today
 date-format: long
