@@ -22,7 +22,7 @@ The results suggest a close race, with Trump holding a slight edge in the Electo
 
 Understanding these projected outcomes is essential for several reasons. First, the model highlights the limitations of relying solely on national polling to predict election results, emphasizing the continued relevance of the Electoral College system in determining the presidency. Additionally, it sheds light on the evolving political landscape in swing states, where demographic changes and shifting voter allegiances can have outsized impacts. These insights contribute to a broader understanding of how statistical modeling can inform political strategy and election analysis.
 
-The structure of the paper is as follows: In @sec-data, we provide outlines the data sources and variables considered, followed by the model setup in [@sec-mod] and justification. The results [@sec-result] presents the key findings of the analysis, with a discussion on the implications of these results for political forecasting and public opinion analysis. Finally, the paper concludes with an overview of potential limitations and suggestions for future research in the discussion [@sec-discussion]. 
+The structure of the paper is as follows: In @sec-data, we provide outlines the data sources and variables considered, followed by the model setup in [@sec-mod] and justification. The results [@sec-result] presents the key findings of the analysis, with a discussion on the implications of these results for political forecasting and public opinion analysis. Finally, the paper concludes with an overview of potential limitations and suggestions for future research in the discussion [@sec-discussion].
 
 # Data {#sec-data}
 
@@ -31,12 +31,15 @@ The structure of the paper is as follows: In @sec-data, we provide outlines the 
 The data used in this analysis comes from a combination of publicly available polling data for the 2024 U.S. Presidential election. The analysis leverages R and several libraries, including tidyverse [@tidyverse], janitor [@janitor], knitr [@knitr], dplyr [@dplyr], purrr [@purrr], and here [@here], for data manipulation, and ggplot2 [@ggplot] for visualization. The dataset covers various polls conducted across multiple states, capturing the support for each major candidate—Donald Trump and Kamala Harris—along with detailed attributes of the polls.
 
 ## Measurement
+
 The primary measurements in the dataset include polling scores, sample sizes, and predicted percentages for each candidate. The data is filtered to include only polls relevant to the two primary candidates, and features like PollRecency were constructed to weigh recent polls higher. The data was cleaned by removing irrelevant or incomplete observations, and new variables were constructed where necessary.
 
 ## Outcome Variables
+
 The main outcome variable of interest is the Percentage of support each candidate has in a given poll, which represents the proportion of respondents who favor one candidate over the other. This variable is crucial for estimating both the popular vote and Electoral College outcomes.
 
 ## Predictor Variables
+
 Key predictors include:
 
 PollScore: A numeric value that reflects the credibility of the pollster.
@@ -52,20 +55,21 @@ NumericGrade: A numerical representation of the reliability of the pollster.
 CandidateName: The name of the candidate being polled (either Donald Trump or Kamala Harris).
 
 # Model {#sec-mod}
+
 To predict the outcome of the 2024 U.S. Presidential election, we developed two linear regression models: one for Donald Trump and one for Kamala Harris. These models aim to estimate the percentage of support for each candidate based on the aforementioned predictor variables.
 
 ## Model Set-Up
-This paper utilized a linear model:
-$$Percentage_i = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$
-where, Percentage$_i$ represents the predicted support percentage for a candidate in a given poll.
+
+This paper utilized a linear model: $$Percentage_i = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$ where, Percentage$_i$ represents the predicted support percentage for a candidate in a given poll.
 
 $\beta_i$ are the coefficients of the model that quantify the impact of each predictor.
 
 $\epsilon_i$ is the error term.
 
 The results from these models are aggregated to compute the predicted percentage of support for each candidate in each state. Based on these percentages, we forecast the likely winner of the state’s electoral votes.
-  
+
 ## Model Justification
+
 This model was chosen for its balance between simplicity and predictive power. Linear regression allows us to capture relationships between polling quality, sample size, and recency, while still providing interpretable coefficients. Given the nature of polling data, this approach is both appropriate and commonly used in election forecasting. The model was validated using out-of-sample testing and Root Mean Square Error to ensure predictive accuracy.
 
 ```{r}
@@ -191,9 +195,11 @@ print(state_winners, n=54)
 ```
 
 # Results {#sec-result}
+
 The model results (see Appendix for details) show a clear distribution of support for both candidates across various states. The predicted percentages of support were normalized to ensure they summed up to 100%. After computing these results, we forecast that Donald Trump is likely to win 302 electoral votes, while Kamala Harris is expected to secure 233 electoral votes.
 
-[WILL CHANGE THE FORMAT OF THESE GRAPHS AND CAPTION/DESCRIPTION WILL BE ADDED]
+\[WILL CHANGE THE FORMAT OF THESE GRAPHS AND CAPTION/DESCRIPTION WILL BE ADDED\]
+
 ```{r}
 #| label: fig-sum
 #| fig-cap: [Need Edit]
@@ -213,29 +219,85 @@ summary_stats <- cleaned_data %>%
   )
 
 print(summary_stats)
+```
 
+```{r}
+#| label: fig-pollscore
+#| fig-cap: [Need Edit]
+#| fig-subcap: [""]
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 ggplot(cleaned_data, aes(x = PollScore)) +
   geom_histogram(bins = 30, fill = "blue", alpha = 0.7) +
   labs(title = "Distribution of Poll Scores", x = "Poll Score", y = "Frequency")
+```
 
+```{r}
+#| label: fig-samplesize
+#| fig-cap: [Need Edit]
+#| fig-subcap: [""]
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 ggplot(cleaned_data, aes(x = SampleSize)) +
   geom_histogram(bins = 30, fill = "green", alpha = 0.7) +
   labs(title = "Distribution of Sample Size", x = "Sample Size", y = "Frequency")
+```
 
+```{r}
+#| label: fig-percentage
+#| fig-cap: [Need Edit]
+#| fig-subcap: [""]
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 ggplot(cleaned_data, aes(x = Percentage)) +
   geom_histogram(bins = 30, fill = "orange", alpha = 0.7) +
   labs(title = "Distribution of Percentage", x = "Percentage", y = "Frequency")
+```
 
+```{r}
+#| label: fig-candidatepercentage
+#| fig-cap: [Need Edit]
+#| fig-subcap: [""]
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 ggplot(cleaned_data, aes(x = CandidateName, y = Percentage)) +
   geom_boxplot() +
   labs(title = "Percentage by Candidate", x = "Candidate", y = "Percentage") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
+will update these box plots to different visuals due to box plots not showing the full dataset!
+
+```{r}
+#| label: fig-statepercentage
+#| fig-cap: [Need Edit]
+#| fig-subcap: [""]
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 ggplot(cleaned_data, aes(x = State, y = Percentage)) +
   geom_boxplot() +
   labs(title = "Percentage by State", x = "State", y = "Percentage") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
+```{r}
+#| label: fig-corrmatrix
+#| fig-cap: [Need Edit]
+#| fig-subcap: [""]
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 numerical_data <- cleaned_data %>%
   select(PollScore, SampleSize, Percentage)
 
@@ -248,16 +310,16 @@ ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
 \newpage
 
 # Discussion {#sec-discussion}
+
 In this paper, we developed and implemented a predictive model to forecast the outcome of the 2024 U.S. Presidential election, focusing on both popular vote percentages and Electoral College results. The model incorporates polling data, demographic information, and state-specific effects.
 
 The model teaches us that state-level dynamics play a crucial role in determining the winner of U.S. Presidential elections. Even though Harris is expected to lead in the popular vote, Trump’s success in key battleground states suggests a victory in the Electoral College. An additional insight is that poll recency and pollster reliability significantly affect the accuracy of electoral predictions. By weighing recent and higher-quality polls more heavily, the model improves the robustness of its forecasts.
 
 While the model adopts a linear regression framework for its simplicity and interpretability, this choice may limit its ability to capture more complex relationships among variables. Future iterations might benefit from exploring nonlinear models or advanced machine learning techniques, which could uncover patterns not readily observable through traditional methods.
 
-One limitation of this model is that it depends entirely on polling data, which may not always capture late shifts in voter preferences or turnout variations. Furthermore, the model does not account for external factors like campaign events or last-minute developments, which can significantly influence electoral outcomes. 
+One limitation of this model is that it depends entirely on polling data, which may not always capture late shifts in voter preferences or turnout variations. Furthermore, the model does not account for external factors like campaign events or last-minute developments, which can significantly influence electoral outcomes.
 
 Future research should aim to integrate alternative data sources, such as social media sentiment or economic indicators, to provide a more comprehensive view of voter preferences. More advanced machine learning techniques could also be explored to improve the accuracy of future election predictions.
-
 
 \newpage
 
@@ -266,6 +328,112 @@ Future research should aim to integrate alternative data sources, such as social
 ## Additional Data Details
 
 ## Model Details {#sec-model-details}
+
+## Idealized Methodology
+
+This is an outline. I will turn this into paragraph style this week.
+
+**Target Population:** The target population is eligible US voters from all 50 states and Washington D.C. –\> representation from every state for an Electoral College forecast.
+
+**Sampling Method**
+
+\- Stratified Random Sampling: The sample will be stratified by state, ensuring each state is proportionally represented in terms of population size and key voter demographics (age, gender, race/ethnicity, income, political affiliation).
+
+\- Key Stratification Variables: Within each state, voters will be further stratified based on party affiliation, urban/rural distribution, and voting history.
+
+\- For swing states, we will ensure oversampling to capture more granular data.
+
+**Sample Size**
+
+\- The total sample size will be 15,000 respondents –\> ensures state-level representation while maintaining a national margin of error of ±1%.
+
+\- As mentioned above, swing states will have an additional focus, with 1,000+ respondents per state (depending on population size).
+
+\- Electoral vote-rich states (e.g., California, Texas, Florida) will be proportionally represented to reflect their impact on the election outcome.
+
+\- With an estimated response rate of 10%, we aim to recruit 150,000 potential respondents across states.
+
+**Recruiting Respondents**
+
+\- Panel Providers: Utilize online panel providers (such as YouGov, Ipsos, or Dynata) for geographically and demographically targeted respondents by state.
+
+\- Social Media Ads: Conduct state-targeted ads on platforms like Facebook and Instagram\*for broad geographic reach
+
+\- State-Specific Phone Surveys: To reach older and less tech-savvy voters, particularly in states with higher proportions of rural populations, we will use IVR phone surveys and live calls.
+
+\- Respondents will be entered into state-level sweepstakes, with one winner per state
+
+**Data Collection**
+
+\- Surveys will be conducted on platforms like Qualtrics or SurveyMonkey, with branching logic for state-specific questions. Telephone surveys for older demographics will be integrated. The mock survey will be conducted using Google Forms for the purposes of accessibility.
+
+\- The survey will take approximately 5 minutes in order to minimize drop-off rates
+
+\- The survey will include state-specific questions and national-level questions, such as voting intent, candidate preference, key issues, and voter perception.
+
+\- Weighting by State: Data will be weighted post-collection to ensure state-level accuracy, considering the latest Census data and state voting records.
+
+**Data Validation**
+
+\- Validate completion time (speeding checks), IP tracking (to prevent duplicate responses), and reCAPTCHA to prevent bots.
+
+\- Respondents will be asked their state of residence, and ZIP code for additional verification.
+
+\- Data will be weighted by state demographics and previous election turnout using Census and state voting data. Swing states will receive additional attention to ensure no underrepresentation of key voter segments.
+
+include budget allocation?
+
+**Survey Structure (will be migrated to google form)**
+
+Introduction
+
+\- Brief description of the survey’s purpose (US Presidential Election Forecast with a focus on state-level dynamics).
+
+\- Assurance of confidentiality and anonymity, with a clear outline of data use.
+
+\- Contact details for survey-related inquiries.
+
+Questions
+
+1\. Demographics:
+
+\- State of Residence (Dropdown list of all 50 states and D.C.)
+
+\- Age, gender, race/ethnicity, income level, education, party affiliation (Republican, Democrat, Independent, Other).
+
+2\. Voter Registration:
+
+\- Are you registered to vote in the upcoming election? (Yes/No)
+
+\- How likely are you to vote in the upcoming election? (Likert scale)
+
+3\. Voting Intent:
+
+\- If the election were held today, who would you vote for? (List of candidates specific to the respondent’s state, based on ballot access).
+
+\- How certain are you of your choice? (Likert scale)
+
+4\. Key Issues:
+
+\- What are the most important issues influencing your vote? (Rank the top 3 issues: Economy, Healthcare, Immigration, Climate Change, National Security, Social Issues, etc.)
+
+5\. State-Specific Issues:
+
+\- What state-level issues are important to you? (Open-ended question, with suggestions like state economy, healthcare access, local infrastructure, etc.)\
+
+6\. Perceptions of Candidates:
+
+\- Rate the following candidates on trustworthiness, competence, leadership, etc. (Likert scale, customized for state-level candidates where applicable).
+
+7\. Previous Voting Behavior:
+
+\- Did you vote in the last presidential election? (Yes/No)
+
+\- If yes, who did you vote for? (Open response, with drop-down of major candidates for validation)
+
+Closing
+
+\- Thank You: Thank the respondents for their time and participation, reminding them of the sweepstakes.
 
 \newpage
 
