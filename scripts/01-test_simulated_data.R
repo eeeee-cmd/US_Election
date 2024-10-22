@@ -5,15 +5,16 @@
 # Date: October 22nd, 2024
 # Contact: sophia.brothers@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` package must be installed
+# Pre-requisites: The `tidyverse` and 'arrow' packages must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
 # load libraries
 library(dplyr)
 library(purrr)
+library(arrow)
 
 # read the simulated data
-data <- read_csv(here::here("data/simulated_data/simulated_data.csv"))
+data <- read_parquet(here::here("data/simulated_data/simulated_data.parquet"))
 
 # initialize an empty list to store the results of each test (pass/fail)
 test_results <- list()
