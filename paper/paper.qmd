@@ -1,5 +1,6 @@
 ---
 title: "Trump vs. Harris: A Data-Driven Forecast modeling the 2024 US Presidential Elections"
+subtitle: "A close race but Trump, trumps Harris"
 author: 
   - Sophia Brothers
   - Deyi Kong
@@ -12,6 +13,33 @@ format: pdf
 number-sections: true
 bibliography: references.bib
 ---
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+# Install Packages if not downloaded:
+required_packages <- c(
+  "tidyverse", "sf", "here", "arrow", "ggplot2", "janitor", "purrr", "knitr", "kableExtra"
+) 
+for (p in required_packages) { 
+  if (!require(p, character.only = TRUE)) {
+    install.packages(p, character.only = TRUE)
+  }
+}
+
+library(tidyverse)
+library(sf)
+library(dplyr)
+library(here)
+library(arrow)
+library(ggplot2)
+library(janitor)
+library(purrr)
+library(knitr)
+library(kableExtra)
+```
 
 # Introduction
 
@@ -29,7 +57,7 @@ The structure of the paper is as follows: In @sec-data, we provide outlines the 
 
 ## Overview
 
-The data used in this analysis comes from a combination of publicly available polling data for the 2024 U.S. Presidential election. The analysis leverages R and several libraries, including tidyverse [@tidyverse], janitor [@janitor], knitr [@knitr], dplyr [@dplyr], purrr [@purrr], and here [@here], for data manipulation, and ggplot2 [@ggplot] for visualization. The dataset covers various polls conducted across multiple states, capturing the support for each major candidate—Donald Trump and Kamala Harris—along with detailed attributes of the polls.
+The data used in this analysis comes from a combination of publicly available polling data for the 2024 U.S. Presidential election[@FiveThirtyEightPolls]. The analysis leverages the statistical programming language R [@citeR] and several libraries, including `tidyverse` [@tidyverse], `janitor` [@janitor], `knitr` [@knitr], `dplyr` [@dplyr], `purrr` [@purrr], and `here` [@here], for data manipulation, and `ggplot2` [@ggplot] for visualization. The dataset covers various polls conducted across multiple states, capturing the support for each major candidate—Donald Trump and Kamala Harris—along with detailed attributes of the polls.
 
 ## Measurement
 
@@ -78,10 +106,6 @@ This model was chosen for its balance between simplicity and predictive power. L
 #| eval: true
 #| warning: false
 #| message: false
-library(tidyverse)
-library(dplyr)
-library(here)
-library(arrow)
 
 cleaned_data <- read_parquet(here::here("data/analysis_data/model_data.parquet"))
 lm_model <- readRDS(here::here("models/lm_model.rds"))
@@ -100,7 +124,14 @@ total_percentage <- sum(results$AveragePredictedPercentage, na.rm = TRUE)
 results <- results %>%
   mutate(NormalizedPercentage = (AveragePredictedPercentage / total_percentage) * 100)
 
-print(results)
+results %>%
+  kable(
+    caption = "Predicted Percentage Vote for Donald Trump and Kamala Harris",
+    col.names = c("Candidate Name", "Average Predicted Percentage", "Normalized Percentage"),
+    digits = 2,
+    booktabs = TRUE
+  ) %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
 ```{r}
@@ -108,10 +139,6 @@ print(results)
 #| eval: true
 #| warning: false
 #| message: false
-
-library(tidyverse)
-library(here)
-library(arrow)
 
 cleaned_data <- read_parquet(here::here("data/analysis_data/electoral_data.parquet"))
 lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
@@ -182,7 +209,21 @@ electoral_totals <- predictions_with_votes %>%
     HarrisTotalElectoralVotes = sum(HarrisElectoralVotes, na.rm = TRUE)
   )
 
-print(electoral_totals)
+electoral_totals %>%
+  kable(
+    caption = "Predicted Number of Electoral Votes for Donald Trump and Kamala Harris",
+    col.names = c("Trumps Total Electoral Votes", "Harriss Total Electoral Votes"),
+    digits = 2,
+    booktabs = TRUE
+  ) %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 
 state_winners <- predictions_with_votes %>%
   select(State, TrumpPredicted, HarrisPredicted) %>%
@@ -193,8 +234,17 @@ state_winners <- predictions_with_votes %>%
       TRUE ~ "Tie"
     )
   )
+#print(state_winners, n=54)
 
-print(state_winners, n=54)
+state_winners %>%
+  slice(1:53) %>%
+  kable(
+    caption = "Predicted Percentage of Electoral Votes Per State",
+    col.names = c("State", "Trump Predicted %", "Harris Predicted %", "Winner"),
+    digits = 2,
+    booktabs = TRUE
+  ) %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
 # Results {#sec-result}
@@ -204,9 +254,8 @@ The model results (see Appendix for details) show a clear distribution of suppor
 \[WILL CHANGE THE FORMAT OF THESE GRAPHS AND CAPTION/DESCRIPTION WILL BE ADDED\]
 
 ```{r}
-#| label: fig-sum
+#| label: tbl-sum
 #| fig-cap: [Need Edit]
-#| fig-subcap: [""]
 #| echo: false
 #| eval: true
 #| warning: false
@@ -221,68 +270,146 @@ summary_stats <- cleaned_data %>%
     TotalPolls = n()
   )
 
-print(summary_stats)
+# print(summary_stats)
+
+summary_stats %>%
+  kable(
+    caption = "Summary Statistics of Model Results",
+    col.names = c("Average Poll Score", "Average Sample Size", "Average Percentage", "Total Polls"),
+    digits = 3,
+    booktabs= TRUE
+  ) %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
 ```{r}
-#| label: fig-pollscore
-#| fig-cap: [Need Edit]
-#| fig-subcap: [""]
+#| label: fig-predictedscoremap
+#| fig-cap: "Mapped Model-predicted outsom for 2024 elections by State"
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
-ggplot(cleaned_data, aes(x = PollScore)) +
-  geom_histogram(bins = 30, fill = "blue", alpha = 0.7) +
-  labs(title = "Distribution of Poll Scores", x = "Poll Score", y = "Frequency")
+
+states_map <- map_data("state")
+
+electoral_data <- predictions_with_votes
+electoral_data$State <- tolower(electoral_data$State) # matching state names
+
+merged_data <- inner_join(states_map, electoral_data, by = c("region" = "State"))
+
+map <- ggplot(merged_data, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = Winner), color = "white") +
+  scale_fill_manual(values = c("Donald Trump" = "red", "Kamala Harris" = "blue")) +
+  labs(title = "2024 US Presidential Election Predictions by State",
+       fill = "Predicted Winner") +
+  theme_void() +
+  theme(legend.position = "right")
+
+map
+```
+
+```{r}
+#| label: fig-pollscoredistribution
+#| fig-cap: Distribution of Poll Scores by Candidate with denisty overlayed
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+Select_candidates_cleaned_data <- cleaned_data %>%
+  filter(CandidateName %in% c("Donald Trump", "Kamala Harris"))
+
+ggplot(Select_candidates_cleaned_data, aes(x = PollScore)) +
+  geom_histogram(aes(y = ..density..),
+                 bins = 30,
+                 fill = "blue",
+                 color = "black",
+                 alpha = 0.7) +
+    geom_density(color = "black", fill = "salmon", alpha = 0.6) +
+  labs(title = "Distribution of Poll Scores by Candidate",
+       x = "Poll Score", 
+       y = "Frequency") +
+  theme_minimal() +
+  facet_wrap(~ CandidateName)
 ```
 
 ```{r}
 #| label: fig-samplesize
 #| fig-cap: [Need Edit]
-#| fig-subcap: [""]
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
+
+
 ggplot(cleaned_data, aes(x = SampleSize)) +
-  geom_histogram(bins = 30, fill = "green", alpha = 0.7) +
-  labs(title = "Distribution of Sample Size", x = "Sample Size", y = "Frequency")
+  geom_histogram(bins = 30,
+                 fill = "green",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Sample Size",
+       x = "Sample Size", 
+       y = "Frequency")+
+  theme_minimal()
 ```
 
 ```{r}
 #| label: fig-percentage
 #| fig-cap: [Need Edit]
-#| fig-subcap: [""]
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
 ggplot(cleaned_data, aes(x = Percentage)) +
-  geom_histogram(bins = 30, fill = "orange", alpha = 0.7) +
-  labs(title = "Distribution of Percentage", x = "Percentage", y = "Frequency")
+  geom_histogram(bins = 30,
+                 fill = "orange",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Percentage", 
+       x = "Percentage",
+       y = "Frequency") +
+  theme_minimal()
 ```
 
 ```{r}
 #| label: fig-candidatepercentage
 #| fig-cap: [Need Edit]
-#| fig-subcap: [""]
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
-ggplot(cleaned_data, aes(x = CandidateName, y = Percentage)) +
-  geom_boxplot() +
-  labs(title = "Percentage by Candidate", x = "Candidate", y = "Percentage") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+harris_trump_selection <- cleaned_data %>%
+  filter(CandidateName %in% c("Donald Trump", 
+                              "Kamala Harris"))
+
+all_candidates <- cleaned_data %>%
+  mutate(CandidateName = "All Candidates")
+
+combined_data <- bind_rows(
+  harris_trump_selection,
+  all_candidates
+)
+
+ggplot(combined_data, aes(x = CandidateName, 
+                          y = Percentage, 
+                          fill = CandidateName)) +
+  geom_violin(alpha = 0.5) +
+  geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
+  labs(title = "Percentage by Candidate", 
+       x = "Candidate", 
+       y = "Percentage") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = c("grey", "salmon", "blue")) +
+  facet_wrap(~CandidateName, scales = "free_x") +
+  theme_minimal()
 ```
 
-will update these box plots to different visuals due to box plots not showing the full dataset!
+will update these box plots to different visuals due to box plots not showing the full dataset! (#Note to team: updated to violin plots to show distribution and selected only trump and harris and another one for all the candidates to show distribution of dataset)
 
 ```{r}
 #| label: fig-statepercentage
 #| fig-cap: [Need Edit]
-#| fig-subcap: [""]
 #| echo: false
 #| eval: true
 #| warning: false
@@ -296,7 +423,6 @@ ggplot(cleaned_data, aes(x = State, y = Percentage)) +
 ```{r}
 #| label: fig-corrmatrix
 #| fig-cap: [Need Edit]
-#| fig-subcap: [""]
 #| echo: false
 #| eval: true
 #| warning: false
@@ -439,5 +565,7 @@ Closing
 \- Thank You: Thank the respondents for their time and participation, reminding them of the sweepstakes.
 
 \newpage
+
+# References
 
 # References
