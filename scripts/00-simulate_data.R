@@ -4,11 +4,11 @@
 # Date: October 22nd, 2024
 # Contact: sophia.brothers@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: The `tidyverse` and 'arrow' packages must be installed
+# Pre-requisites: The `tidyverse` package must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 
 # load libraries
-library(dplyr)
+library(tidyverse)
 library(arrow)
 
 # set seed for reproducability
@@ -55,6 +55,19 @@ poll_data <- data.frame(
   pct = round(runif(n, 30, 60), 2)
 )
 
+# add interactions between variables
+poll_data <- poll_data %>%
+  mutate(
+    pollscore_pct_interaction = pollscore * pct,
+    sample_size_grade_interaction = sample_size * numeric_grade,
+    sample_size_methodology_interaction = case_when(
+      methodology == "Phone" ~ sample_size * 1.1,
+      methodology == "Online" ~ sample_size * 0.9,
+      methodology == "Mixed" ~ sample_size * 1.0,
+      TRUE ~ sample_size
+    )
+  )
+
 # write the cleaned and simulated polling data to a CSV file
-write_csv(cleaned_data, here::here("data/simulated_data/simulated_data.csv"))
-write_parquet(cleaned_data, here::here("data/simulated_data/simulated_data.parquet"))
+write_csv(poll_data, here::here("data/simulated_data/simulated_data.csv"))
+write_parquet(poll_data, here::here("data/simulated_data/simulated_data.parquet"))
