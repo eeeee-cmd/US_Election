@@ -8,7 +8,7 @@ author:
 thanks: "Code and data are available at: [https://github.com/eeeee-cmd/US_Election/](https://github.com/eeeee-cmd/US_Election/)."
 date: today
 date-format: long
-abstract: "This paper predicts the 2024 U.S. Presidential election, utilizing polling data and demographic factors to predict both popular vote and Electoral College outcomes. The findings indicate a close race between Donald Trump and Kamala Harris, and we predict Trump secures the Electoral College due to projected victories in key swing states while Harris maintains a popular vote lead. The results emphasize the role of state-level dynamics, particularly in swing states, in determining election outcomes. The analysis contributes how public opinion data and electoral systems interact, providing insights into electoral dynamics in contemporary U.S. politics."
+abstract: "This paper predicts the 2024 U.S. Presidential election. We utilizes linear regression model deploying polling data and demographic factors to predict both popular vote and Electoral College outcomes. The findings indicate a close race between Donald Trump and Kamala Harris, and we predict Trump will secure the Electoral College due to projected victories in key swing states while Harris maintains a popular vote lead. The results emphasize the role of state-level dynamics, particularly in swing states, in determining election outcomes."
 format: pdf
 toc: true
 toc-depth: 3
@@ -45,11 +45,11 @@ library(kableExtra)
 
 # Introduction
 
-Presidential elections in the United States are pivotal moments that shape not only the nation’s political landscape but also its far-reaching consequences on a global scale. Republicans and Democrats held primary elections across the country earlier in 2024 that eventually filtered down to the main candidates: Donald Trump and Kamala Harris. As electoral outcomes have become increasingly difficult to predict due to polarized political climates and fluctuating public opinion, sophisticated statistical models are essential for forecasting results and understanding the dynamics at play.
+The U.S. presidential election is a pivotal moment not only shapes domestic political landscape but also far-reaching its consequences on a global scale. Republicans and Democrats held primary elections across the country earlier in 2024 that eventually filtered down to the main candidates: Donald Trump and Kamala Harris. The polarized political climate and rapidly shifting public opinion have made predicting outcomes increasingly challenging, where winning key swing states is crucial to securing victory. 
 
-The polarized political climate and rapidly shifting public opinion have made predicting outcomes increasingly challenging, where winning key swing states is crucial to securing victory. The core estimand of this study is the projected electoral outcome in terms of state-level victories and Electoral College votes for the candidate. The model incorporates recent polling data, historical voting patterns, and demographic predictors to estimate the probability of each candidate winning in individual states. The objective is to translate these probabilities into a forecast of Electoral College votes, thus determining the likely overall winner of the election.
+The main estimand is the projected support percentage and each candidate's winning probability in terms of state-level victories and Electoral College votes. This paper utilizes linear regression model incorporates numeric value of the credibility of pollsters, number of respondents, poll's recency to estimate the probability of each candidate winning in individual states. The objective is to translate these probabilities into a forecast the overall winner of the election. Our findings reveal a close race, with Trump holding a slight edge in the Electoral College due to projected victories in key swing states, despite Harris maintaining a lead in national popular vote estimates. 
 
-Our findings reveal a close race, with Trump holding a slight edge in the Electoral College due to projected victories in key swing states, despite Harris maintaining a lead in national popular vote estimates. Trump's path to victory hinges on critical wins in states such as Pennsylvania, Georgia, and Wisconsin, where his projected margins are narrow but statistically significant. Meanwhile, Harris secures strong performances in populous Democratic strongholds like California and New York, but these do not offset Trump’s advantage in less populous yet crucial battleground states. This result underscores the significant influence of swing states and the Electoral College system in determining the outcome, particularly in closely contested elections. These insights contribute to a broader understanding of how statistical modeling can inform political strategy and election analysis.
+Trump's path to victory hinges on critical wins in states such as Pennsylvania, Georgia, and Wisconsin, where his projected margins are narrow but statistically significant. Meanwhile, Harris secures strong performances in populous Democratic strongholds like California and New York, but these do not offset Trump’s advantage in less populous yet crucial battleground states. This result underscores the significant influence of swing states and the Electoral College system in determining the outcome, particularly in closely contested elections. These insights contribute to a broader understanding of how statistical modeling can inform political strategy and election analysis. 
 
 The structure of the paper is as follows: [@sec-data] outlines the data sources and variables considered, followed by the model setup in [@sec-modset] and justification in [@sec-modjust]. The results in [@sec-result] presents the key findings of the analysis, with a discussion on the implications. [@sec-discussion] then discusses potential limitations and suggestions for future research. [@sec-appx] provides additional detailed information about the data, model and methodology.
 
@@ -61,7 +61,9 @@ The data used in this analysis comes from a combination of publicly available po
 
 ## Measurement
 
-The primary measurements in the dataset include polling scores, sample sizes, and predicted percentages for each candidate. The data is filtered to include only polls relevant to the two primary candidates，Trump and Harris, and features like PollRecency were constructed to weigh recent polls higher. The data was cleaned by removing irrelevant or incomplete observations, and new variables were constructed where necessary.
+The primary measurement process reflects the transformation of raw polling data into structured entries to actionable insights for election forecasting. We first select and rename key variables from raw data to focus on relevant information, such as pollster, pollscore, state, polling dates, sample size, and candidate support percentage. These variables represent essential poll characteristics that capture public sentiment in response to real-world campaign dynamics and demographic differences across states.
+
+To address instances where the original data referenced Joe Biden instead of Kamala Harris, we assumed the entries for Biden will goes to Harris in consequences of Democratic Party. This approach is supported by "Harris’s truncated presidential campaign relies heavily upon President Biden’s policy framework and she eaddress the campaign’s weaknesses and win over critical voter demographics [@RealInstitutoElcano]. Thus, substituting Biden’s polling data with Harris’s ensures continuity in demographic appeal without altering established polling trends. Then we filter to include only polls relevant to the two candidates，Trump and Harris, and features like PollRecency were constructed to weigh recent polls higher. The data was cleaned by removing irrelevant or incomplete observations, and new variables were constructed where necessary. 
 
 ## Outcome Variables
 
@@ -85,11 +87,11 @@ CandidateName: The name of the candidate being polled (either Donald Trump or Ka
 
 # Model
 
-To predict the outcome of the 2024 U.S. Presidential election, we developed several linear regression models: one for the popular vote and one for the electoral college. These models aim to estimate the percentage of support for each candidate, filtered to Harris and Trump, based on the aforementioned predictor variables. This is done both nationally at a popular vote level, but also by state to determine the distribution of electoral votes.
+To predict the outcome of the 2024 U.S. Presidential election, we developed two linear regression models: one for Donald Trump and one for Kamala Harris. These models aim to estimate the percentage of support for each candidate based on the aforementioned predictor variables.
 
 ## Model Set-Up {#sec-modset}
 
-This paper utilized a linear model: $$Percentage_i = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$ where, Percentage$_i$ represents the predicted support percentage for a candidate in a given poll.
+This paper utilizes linear regression model: $$Percentage_i = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$ where, Percentage$_i$ represents the predicted support percentage for a candidate in a given poll.
 
 $\beta_i$ are the coefficients of the model that quantify the impact of each predictor.
 
