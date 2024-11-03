@@ -45,11 +45,11 @@ library(kableExtra)
 
 # Introduction
 
-The U.S. presidential election is a pivotal moment not only shapes domestic political landscape but also far-reaching its consequences on a global scale. Republicans and Democrats held primary elections across the country earlier in 2024 that eventually filtered down to the main candidates: Donald Trump and Kamala Harris. The polarized political climate and rapidly shifting public opinion have made predicting outcomes increasingly challenging, where winning key swing states is crucial to securing victory. 
+The U.S. presidential election is a pivotal moment not only shapes domestic political landscape but also far-reaching its consequences on a global scale. Republicans and Democrats held primary elections across the country earlier in 2024 that eventually filtered down to the main candidates: Donald Trump and Kamala Harris. The polarized political climate and rapidly shifting public opinion have made predicting outcomes increasingly challenging, where winning key swing states is crucial to securing victory.
 
-The main estimand is the projected support percentage and each candidate's winning probability in terms of state-level victories and Electoral College votes. This paper utilizes linear regression model incorporates numeric value of the credibility of pollsters, number of respondents, poll's recency to estimate the probability of each candidate winning in individual states. The objective is to translate these probabilities into a forecast the overall winner of the election. Our findings reveal a close race, with Trump holding a slight edge in the Electoral College due to projected victories in key swing states, despite Harris maintaining a lead in national popular vote estimates. 
+The main estimand is the projected support percentage and each candidate's winning probability in terms of state-level victories and Electoral College votes. This paper utilizes linear regression model incorporates numeric value of the credibility of pollsters, number of respondents, poll's recency to estimate the probability of each candidate winning in individual states. The objective is to translate these probabilities into a forecast the overall winner of the election. Our findings reveal a close race, with Trump holding a slight edge in the Electoral College due to projected victories in key swing states, despite Harris maintaining a lead in national popular vote estimates.
 
-Trump's path to victory hinges on critical wins in states such as Pennsylvania, Georgia, and Wisconsin, where his projected margins are narrow but statistically significant. Meanwhile, Harris secures strong performances in populous Democratic strongholds like California and New York, but these do not offset Trump’s advantage in less populous yet crucial battleground states. This result underscores the significant influence of swing states and the Electoral College system in determining the outcome, particularly in closely contested elections. These insights contribute to a broader understanding of how statistical modeling can inform political strategy and election analysis. 
+Trump's path to victory hinges on critical wins in states such as Pennsylvania, Georgia, and Wisconsin, where his projected margins are narrow but statistically significant. Meanwhile, Harris secures strong performances in populous Democratic strongholds like California and New York, but these do not offset Trump’s advantage in less populous yet crucial battleground states. This result underscores the significant influence of swing states and the Electoral College system in determining the outcome, particularly in closely contested elections. These insights contribute to a broader understanding of how statistical modeling can inform political strategy and election analysis.
 
 The structure of the paper is as follows: [@sec-data] outlines the data sources and variables considered, followed by the model setup in [@sec-modset] and justification in [@sec-modjust]. The results in [@sec-result] presents the key findings of the analysis, with a discussion on the implications. [@sec-discussion] then discusses potential limitations and suggestions for future research. [@sec-appx] provides additional detailed information about the data, model and methodology.
 
@@ -63,7 +63,7 @@ The data used in this analysis comes from a combination of publicly available po
 
 The primary measurement process reflects the transformation of raw polling data into structured entries to actionable insights for election forecasting. We first select and rename key variables from raw data to focus on relevant information, such as pollster, pollscore, state, polling dates, sample size, and candidate support percentage. These variables represent essential poll characteristics that capture public sentiment in response to real-world campaign dynamics and demographic differences across states.
 
-To address instances where the original data referenced Joe Biden instead of Kamala Harris, we assumed the entries for Biden will goes to Harris in consequences of Democratic Party. This approach is supported by "Harris’s truncated presidential campaign relies heavily upon President Biden’s policy framework and she eaddress the campaign’s weaknesses and win over critical voter demographics [@RealInstitutoElcano]. Thus, substituting Biden’s polling data with Harris’s ensures continuity in demographic appeal without altering established polling trends. Then we filter to include only polls relevant to the two candidates，Trump and Harris, and features like PollRecency were constructed to weigh recent polls higher. The data was cleaned by removing irrelevant or incomplete observations, and new variables were constructed where necessary. 
+To address instances where the original data referenced Joe Biden instead of Kamala Harris, we assumed the entries for Biden will goes to Harris in consequences of Democratic Party. This approach is supported by "Harris’s truncated presidential campaign relies heavily upon President Biden’s policy framework and she eaddress the campaign’s weaknesses and win over critical voter demographics [@RealInstitutoElcano]. Thus, substituting Biden’s polling data with Harris’s ensures continuity in demographic appeal without altering established polling trends. Then we filter to include only polls relevant to the two candidates，Trump and Harris, and features like PollRecency were constructed to weigh recent polls higher. The data was cleaned by removing irrelevant or incomplete observations, and new variables were constructed where necessary.
 
 ## Outcome Variables
 
@@ -73,7 +73,7 @@ The main outcome variable of interest is the Percentage of support each candidat
 
 Key predictors include:
 
-PollScore: A numeric value that reflects the credibility of the pollster. Stands for "Predictive Optimization of Latent skill Level in Surveys, Considering Overall Record, Empirically." The error and bias we can attribute to a pollster. Negative numbers are better. 
+PollScore: A numeric value that reflects the credibility of the pollster. Stands for "Predictive Optimization of Latent skill Level in Surveys, Considering Overall Record, Empirically." The error and bias we can attribute to a pollster. Negative numbers are better.
 
 SampleSize: The number of respondents in each poll.
 
@@ -462,117 +462,52 @@ Future research should aim to integrate alternative data sources, such as social
 
 # Appendix {#sec-appx}
 
-## Additional Data Details
-
-## Model Details {#sec-model-details}
-
 ## Pollster Methodology
+
+The New York Times/Siena College Poll was ranked the most accurate political pollster in the US following the 2022 midterm elections. They received the max 538 rating of 3 stars, one of only four pollsters to do so. They also had a pollscore of -1.5, meaning they had the least amount of error and bias attributed to them of the 282 pollsters ranked by 538.
+
+The Times/Siena Poll targets registered voters in the United States, emphasizing those in battleground states during presidential elections. Since the US decides it's President based on the Electoral College rather than the national popular vote, this is an important focus in order to correctly determine election outcomes. The sampling frame is derived from a voter file which containing lists of 200 million registered voters as well as their demographic information and prior voting behavior data.
+
+Each poll typically surveys around 1,000 respondents, which is deemed sufficient for achieving a margin of sampling error of approximately 3-4 percentage points. The Times found that tripling the sample size would only reduce the margin of error by a percent or two. This sample size allows for a balance between representativeness and efficiency.
+
+Respondents are recruited through live phone interviews conducted by trained interviewers from call centers in various states. The polling effort includes both landline and cellphone calls, with over 90% of respondents being reached via cellphones.
+
+Times/Siena uses a stratified random sampling technique, where the sample is divided into strata based on demographics such as age, race, gender, and party affiliation. This helps to ensure proportional representation from each group. Stratification helps in achieving a sample that mirrors the voting population, minimizing biases related to demographic variables (i.e. uneducated voters are less likely to respond to polls). However, it faces limitations as stratification increases the complexity of the sampling process, and if strata are not adequately represented in the sample, the results may still skew. Times/Siena combats this by applying weighting adjustments post-survey to correct for any demographic discrepancies.
+
+Given the declining response rates typical of phone surveys, the Times/Siena Poll faces challenges in reaching respondents. Approximately 2% of those contacted ultimately participate. This pollster uses follow-up calls to make multiple attempts to reach individuals who initially do not respond. In 2022, they conducted an experiment to find out if responses were skewed by non-response bias. This was done via a mail survey that offered a reward of up to \$25 for a response. This saw a 30% response rate, which is significantly larger than the 2% response rate Times/Siena gets over phone. Although there were differences between the types of respondents you get between the two methodologies, there was not a meaningful difference in who these respondants claim they would vote for.
+
+The questionnaires used by Times/Siena are designed to capture a broad range of opinions while remaining concise. Interviews are kept under 15 minutes to reduce survey fatigue and maximize response rates. This pollster prioritizes making sure every viewpoint is accurately represented in order to make the questions fair and ensure that respondents are not being swayed in a particular direction. This means the questions must remain objective and clear. However, a survey with limited response options and questions may mean a respondent's view is not captured in its full breadth. It also means that more nuanced opinions may be overlooked in favor of broader trends.
+
+The New York Times/Siena College Poll is rated the most accurate pollster in the US for a reason - it has a well-defined methodology with a fleshed out population frame, sampling approach, and contingencies for non-response handling.
 
 ## Idealized Methodology
 
-This is an outline. I will turn this into paragraph style this week.
+The idealized methodology for forecasting the US presidential election targets eligible registered voters from all 50 states and Washington D.C., ensuring representation from each state in order to create an Electoral College forecast, with particular emphasis on swing (battleground) states.
 
-**Target Population:** The target population is eligible US voters from all 50 states and Washington D.C. –\> representation from every state for an Electoral College forecast.
+The sampling method will utilize stratified random sampling, which stratifies the sample by state. Voters will be further stratified based on factors such as age, gender, race/ethnicity, income, and political affiliation. In swing states, we will ensure oversampling to capture more granular data and reduce our margin of error.
 
-**Sampling Method**
+To maintain a national margin of error of ±4%, the total sample size will be 1,000 respondents per state. Swing states will be oversampled, with over 2,000 respondents to achieve a margin of error of ±2%. Given an estimated response rate of 2%, we aim to recruit approximately 50,000 potential respondents per state, with a target of 100,000 in battleground states.
 
-\- Stratified Random Sampling: The sample will be stratified by state, ensuring each state is proportionally represented in terms of population size and key voter demographics (age, gender, race/ethnicity, income, political affiliation).
+To recruit respondents, we will utilize online panel providers like YouGov, Ipsos, and Dynata to obtain geographically and demographically targeted participants. Additionally, we will conduct state-specific phone surveys, employing interactive voice response (IVR) systems and live calls to reach older and less tech-savvy voters, particularly in states with a higher proportion of rural populations. To incentivize participation, all respondents will be entered into state-level sweepstakes, with one winner selected per state.
 
-\- Key Stratification Variables: Within each state, voters will be further stratified based on party affiliation, urban/rural distribution, and voting history.
+Data collection will be conducted on platforms such as Google Forms. Telephone surveys will follow the layout and workflow of the Google Form survey. The survey is designed to take approximately five to ten minutes to complete in order to minimize drop-off rates. It will include national-level questions, covering voting intent, candidate preference, key issues, and voter perceptions. After collection, the data will be weighted by state and demographic factors to ensure accuracy, utilizing the latest Census data and state voting records.
 
-\- For swing states, we will ensure oversampling to capture more granular data.
+For data validation, we will implement several measures, including completion time checks to identify speeding responses, IP tracking to prevent duplicate entries, and reCAPTCHA to guard against bots. Respondents will provide their state of residence and ZIP code for additional verification. Furthermore, the data will be weighted according to state demographics and previous election turnout data, utilizing information from Census and state voting records. Special attention will be paid to swing states to ensure no key voter segments are underrepresented.
 
-**Sample Size**
+In terms of budget allocation, we will designate funds as follows:
 
-\- The total sample size will be 15,000 respondents –\> ensures state-level representation while maintaining a national margin of error of ±1%.
+1.  Survey Development (\$7,000):
+    -   The \$7,000 covers the costs associated with designing the survey, including the creation of questions, structuring the survey for clarity and flow, and ensuring that it meets methodological standards. It may also include hiring experts in survey design or consulting with statisticians to validate the survey framework and ensure questions are unbiased. Additionally, while Google Forms is free, this budget may account for platform costs if needed.
+2.  Accurate Sampling (\$10,000):
+    -   The sampling budget is allocated for the costs associated with selecting a representative sample of voters. This includes expenses related to stratified random sampling, where the sample is segmented by various demographics and state representation. In order to ensure each demographic share is accurately represented, we may need to purchase access to demographic data or employ statisticians to ensure that the sampling aligns with the population of each state.
+3.  Recruiting Respondents (\$45,000):
+    -   The majority of the budget is dedicated to recruiting respondents, which is necessary for achieving a large and demographically representative sample. This cost will cover payments to online panel providers which charge fees for access to their respondent pools. Additionally, this budget will cover costs related to conducting state-specific phone surveys and IVR calls, such as hiring call center staff or IVR technology.
+4.  Respondent Incentives (\$28,000):
+    -   To encourage participation, we plan to run state-level sweepstakes, where respondents have a chance to win prizes for completing the survey. A \$500 prize will be awarded to one winner in each state (+ Washington DC). The remaining budget will cover administrative expenses associated with running the sweepstakes.
+5.  Data Analysis and Reporting (\$10,000):
+    -   This portion of the budget is reserved for the costs related to analyzing the collected data and reporting the findings. This may include hiring data analysts or consultants who specialize in statistical analysis and survey data interpretation. The funds will also cover software tools necessary for data analysis, as well as the creation of visualizations and reports to communicate the results effectively.
 
-\- As mentioned above, swing states will have an additional focus, with 1,000+ respondents per state (depending on population size).
-
-\- Electoral vote-rich states (e.g., California, Texas, Florida) will be proportionally represented to reflect their impact on the election outcome.
-
-\- With an estimated response rate of 10%, we aim to recruit 150,000 potential respondents across states.
-
-**Recruiting Respondents**
-
-\- Panel Providers: Utilize online panel providers (such as YouGov, Ipsos, or Dynata) for geographically and demographically targeted respondents by state.
-
-\- Social Media Ads: Conduct state-targeted ads on platforms like Facebook and Instagram\*for broad geographic reach
-
-\- State-Specific Phone Surveys: To reach older and less tech-savvy voters, particularly in states with higher proportions of rural populations, we will use IVR phone surveys and live calls.
-
-\- Respondents will be entered into state-level sweepstakes, with one winner per state
-
-**Data Collection**
-
-\- Surveys will be conducted on platforms like Qualtrics or SurveyMonkey, with branching logic for state-specific questions. Telephone surveys for older demographics will be integrated. The mock survey will be conducted using Google Forms for the purposes of accessibility.
-
-\- The survey will take approximately 5 minutes in order to minimize drop-off rates
-
-\- The survey will include state-specific questions and national-level questions, such as voting intent, candidate preference, key issues, and voter perception.
-
-\- Weighting by State: Data will be weighted post-collection to ensure state-level accuracy, considering the latest Census data and state voting records.
-
-**Data Validation**
-
-\- Validate completion time (speeding checks), IP tracking (to prevent duplicate responses), and reCAPTCHA to prevent bots.
-
-\- Respondents will be asked their state of residence, and ZIP code for additional verification.
-
-\- Data will be weighted by state demographics and previous election turnout using Census and state voting data. Swing states will receive additional attention to ensure no underrepresentation of key voter segments.
-
-include budget allocation?
-
-**Survey Structure (will be migrated to google form)**
-
-Introduction
-
-\- Brief description of the survey’s purpose (US Presidential Election Forecast with a focus on state-level dynamics).
-
-\- Assurance of confidentiality and anonymity, with a clear outline of data use.
-
-\- Contact details for survey-related inquiries.
-
-Questions
-
-1\. Demographics:
-
-\- State of Residence (Dropdown list of all 50 states and D.C.)
-
-\- Age, gender, race/ethnicity, income level, education, party affiliation (Republican, Democrat, Independent, Other).
-
-2\. Voter Registration:
-
-\- Are you registered to vote in the upcoming election? (Yes/No)
-
-\- How likely are you to vote in the upcoming election? (Likert scale)
-
-3\. Voting Intent:
-
-\- If the election were held today, who would you vote for? (List of candidates specific to the respondent’s state, based on ballot access).
-
-\- How certain are you of your choice? (Likert scale)
-
-4\. Key Issues:
-
-\- What are the most important issues influencing your vote? (Rank the top 3 issues: Economy, Healthcare, Immigration, Climate Change, National Security, Social Issues, etc.)
-
-5\. State-Specific Issues:
-
-\- What state-level issues are important to you? (Open-ended question, with suggestions like state economy, healthcare access, local infrastructure, etc.)\
-
-6\. Perceptions of Candidates:
-
-\- Rate the following candidates on trustworthiness, competence, leadership, etc. (Likert scale, customized for state-level candidates where applicable).
-
-7\. Previous Voting Behavior:
-
-\- Did you vote in the last presidential election? (Yes/No)
-
-\- If yes, who did you vote for? (Open response, with drop-down of major candidates for validation)
-
-Closing
-
-\- Thank You: Thank the respondents for their time and participation, reminding them of the sweepstakes.
+An example of the survey can be found at this link: <https://forms.gle/igzK683kHLYytGvu8>
 
 \newpage
 
