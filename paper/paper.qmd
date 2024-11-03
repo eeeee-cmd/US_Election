@@ -85,7 +85,7 @@ CandidateName: The name of the candidate being polled (either Donald Trump or Ka
 
 # Model
 
-To predict the outcome of the 2024 U.S. Presidential election, we developed two linear regression models: one for Donald Trump and one for Kamala Harris. These models aim to estimate the percentage of support for each candidate based on the aforementioned predictor variables.
+To predict the outcome of the 2024 U.S. Presidential election, we developed several linear regression models: one for the popular vote and one for the electoral college. These models aim to estimate the percentage of support for each candidate, filtered to Harris and Trump, based on the aforementioned predictor variables. This is done both nationally at a popular vote level, but also by state to determine the distribution of electoral votes.
 
 ## Model Set-Up {#sec-modset}
 
