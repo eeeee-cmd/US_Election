@@ -66,9 +66,19 @@ The data used in this analysis comes from a combination of publicly available po
 
 ## Measurement
 
-The primary measurement process reflects the transformation of raw polling data into structured entries to actionable analysis for election forecasting. We first select and rename key variables from raw data to focus on relevant information, such as pollster, pollscore, state, polling dates, sample size, and candidate support percentage. These variables represent essential poll characteristics that capture public sentiment in response to real-world campaign dynamics and demographic differences across states.
+The dataset used in this analysis originates from various polling organizations, as listed in @PollsterRating, that conducted surveys to gauge public opinion on the presidential candidates, Donald Trump and Kamala Harris.
+
+The measurement process begins with the identification of the target population—likely voters—who are sampled to reflect the broader electorate. Polling organizations use various methodologies to gather data, such as telephone interviews, online surveys, and in-person polling. Each methodology has it's own implications for accuracy and representativeness.
+
+Polling organizations aggregate responses and apply statistical methods to estimate the percentages of support for each candidate. This aggregation process converts individual voter opinions into a summary statistic—the Percentage—that reflects the overall sentiment within the sampled population. These become rows in the raw dataset, reflecting the percentage of support for different pollsters, candidates, methodologies, etc.
+
+## Data Cleaning
+
+We first select and rename key variables from raw data to focus on relevant information. The key variables of interest in our analysis include PollScore, SampleSize, NumericGrade, PollRecency, State, and Percentage, with PollRecency being a variable we created.
 
 To address instances where the original data referenced Joe Biden instead of Kamala Harris, we assumed the entries for Biden will goes to Harris in consequences of Democratic Party. This approach is supported by "Harris’s truncated presidential campaign relies heavily upon President Biden’s policy framework and she eaddress the campaign’s weaknesses and win over relevant voter demographics [@RealInstitutoElcano]. Thus, substituting Biden’s polling data with Harris’s ensures continuity in demographic appeal without altering established polling trends. Then we filter to include only polls relevant to the two candidates，Trump and Harris, and features like PollRecency were constructed to weigh recent polls higher. The data was cleaned by removing irrelevant or incomplete observations, and new variables were constructed where necessary.
+
+More information on the data cleaning process can be found in @sec-appx.
 
 ## Outcome Variables
 
@@ -318,7 +328,9 @@ As defined in [@sec-data], each predictor variable has been chosen to reflect ch
 
 ## Model Justification {#sec-modjust}
 
-While other complex models could be appropriate in this instance, these models were chosen for its balance between simplicity and predictive power. Linear regression allows us to capture relationships between polling quality, sample size, and recency, while still providing interpretable coefficients. Given the nature of polling data, this approach is both appropriate and commonly used in election forecasting. A linear model allows us to directly interpret the influence of each predictor on voter support.
+We considered both linear regression (LM) and generalized linear models (GLM) to predict support percentages from polling data. We chose linear regression for its simplicity, where the coefficients indicate how each predictor affects the response variable directly. Linear regression is effective when the response variable is continuous and normally distributed, which fits our data well. While GLMs offer more flexibility, they can be more complex and harder to interpret. They can also lead to overfitting if you have many predictors.
+
+Linear regression allows us to capture relationships between our predictor variables, while still providing interpretable coefficients. Given the nature of polling data, this approach is both appropriate and commonly used in election forecasting.
 
 ## Assumptions and Limitations
 
