@@ -614,7 +614,49 @@ In 2020, Georgia turned blue in a presidential election for the first time since
 
 One limitation is its reliance on polling data, which can be inherently biased due to sampling issues, response rates, and potential biases in who chooses to respond to polls. Moreover, as the election date approaches, polling data may fail to capture recent shifts in voter sentiment resulting from unforeseen events or major campaign developments. For example, last-minute political controversies or debates can alter public opinion quickly.
 
-For instance, a recent incident involving derogatory comments about Puerto Rico made at a Trump rally has quickly influenced the views of Puerto Rican voters in Pennsylvania. Puerto Rican voters, who make up nearly half a million people in the state, have voiced anger and disapproval, with some even reversing their voting plans [@Hill2024]. WhatsApp groups, morning radio shows, and community discussions have amplified these sentiments, illustrating how quickly backlash can spread through influential networks, particularly in swing states [@Hill2024]. Our model predicts Trump will win Pennsylvania by a margin of 0.8%, which is less than the 3.7% of Pennsylvania's Population that Puerto Ricans make up [@USCensus2020]. Situations like these could easily cause Pennsylvania's 19 electoral votes to swing the other way.
+For instance, a recent incident involving derogatory comments about Puerto Rico made at a Trump rally has quickly influenced the views of Puerto Rican voters in Pennsylvania. Puerto Rican voters, who make up nearly half a million people in the state, have voiced anger and disapproval, with some even reversing their voting plans [@Hill2024]. WhatsApp groups, morning radio shows, and community discussions have amplified these sentiments, illustrating how quickly backlash can spread through influential networks, particularly in swing states [@Hill2024]. Our model predicts Trump will win Pennsylvania by a margin of 0.8%, which is less than the 3.7% of Pennsylvania's Population that Puerto Ricans make up [@USCensus2020]. @fig-swingstates shows specifically the battleground states that are under contention. Situations like these could easily cause Pennsylvania's 19 electoral votes to swing the other way, turning from red to blue.
+
+```{r}
+#| label: fig-swingstates
+#| fig-cap: "Mapped Model-predicted outcomes for 2024 elections by Swing State"
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+# filter for swing states
+battleground_states <- predictions_with_votes %>%
+  select(State, TrumpPredicted, HarrisPredicted) %>%
+  mutate(
+    Margin = abs(TrumpPredicted - HarrisPredicted),
+    Winner = case_when(
+      TrumpPredicted > HarrisPredicted ~ "Donald Trump",
+      HarrisPredicted > TrumpPredicted ~ "Kamala Harris",
+      TRUE ~ "Tie"
+    )
+  ) %>%
+  filter(Margin <= 4) %>%
+  select(State, Winner)
+
+battleground_states <- battleground_states %>%
+  mutate(State = tolower(State))
+
+merged_data <- states_map %>%
+  left_join(battleground_states, by = c("region" = "State"))
+
+# map that displays electoral college winners for swing states
+map <- ggplot(merged_data, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = Winner), color = "white") +
+  scale_fill_manual(values = c("Donald Trump" = "red", "Kamala Harris" = "blue", "NA" = "grey")) +
+  labs(
+    title = "2024 US Presidential Election Battleground States",
+    fill = "Predicted Winner"
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
+
+map
+```
 
 Another limitation is the assumption that past trends will remain consistent across elections, which does not account for the ongoing demographic and ideological shifts within states. For instance, the influx of highly educated individuals into certain states can shift voting patterns over time, as research indicates that Americans with a college degree or higher are more likely to vote for liberal candidates [@pew2016]. Should a state’s population of college-educated voters grow significantly, this change could lead to unexpected voting outcomes that our model might not fully capture.
 
