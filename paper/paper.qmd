@@ -67,17 +67,23 @@ To address instances where the original data referenced Joe Biden instead of Kam
 
 ## Outcome Variables
 
-The main outcome variable of interest is the Percentage of support each candidate has in a given poll, which represents the proportion of respondents who favor one candidate over the other. This variable is crucial for estimating both the popular vote and Electoral College outcomes.
+The main outcome variable of interest is the Percentage of support each candidate has in a given poll, which represents the proportion of respondents who favor one candidate over the other. This variable is crucial for estimating both the popular vote and Electoral College outcomes. We see a bimodal distribution in @fig-percentage. This indicates that candidates are either recieveing very high percentages of support or very low percentages of support. When we pull out Harris and Trump and view their distributions versus all candidates in @fig-candidatepercentage, we see that these two candidates see statistically high percentages of support, indicating they are leading the polls.
 
 ## Predictor Variables
 
-In this analysis, several key predictors were identified to evaluate polling data effectively. The first variable, **PollScore**, is a numeric representation of the pollster's credibility, which stands for "Predictive Optimization of Latent Skill Level in Surveys, Considering Overall Record, Empirically." This score helps assess the error and bias associated with a specific pollster, where lower values (including negative numbers) indicate better credibility [@PollsterRating].
+In this analysis, several key predictors were identified to evaluate polling data effectively. The first variable, **PollScore**, is a numeric representation of the pollster's credibility, which stands for "Predictive Optimization of Latent Skill Level in Surveys, Considering Overall Record, Empirically." This score helps assess the error and bias associated with a specific pollster, where lower values (including negative numbers) indicate better credibility [@PollsterRating]. @fig-pollscoredistribution reveals whether the majority of pollsters tend to have high or low credibility scores. We see a higher concentration of negative scores, which suggests a trend toward more reputable pollsters in the dataset.
 
-Next, **SampleSize** refers to the number of respondents involved in each poll. A larger sample size generally enhances the reliability of poll results, as it is more likely to represent the broader population accurately. The **State** variable denotes the U.S. state where the poll was conducted, in order to give geographical context.
+Next, **SampleSize** refers to the number of respondents involved in each poll. A larger sample size generally enhances the reliability of poll results, as it is more likely to represent the broader population accurately. In @fig-samplesize we see that the vast majority of polls in the dataset have a sample size of less than 2500. As discussed in @sec-appx, this number maximizes efficiency and accuracy while minimizing the margin of error. The **State** variable denotes the U.S. state where the poll was conducted, in order to give geographical context. All 50 states are represented in this analysis, and Nebraska and Maine are broken up into electoral districts. Washington DC is not included in this dataset. @fig-statesample shows the number of polls conducted in each state. Battleground states notably have a higher number of polls conducted.
 
-**PollRecency** is a variable we created to measure the number of days between the start date of the poll and the present. This is important as more recent polls tend to reflect the current political climate and voter sentiment more accurately than polls that were conducted a year ago, or more. Lastly, **NumericGrade** is a numerical assessment of the pollster's reliability.
+**PollRecency** is a variable we created to measure the number of days between the start date of the poll and the present. This is important as more recent polls tend to reflect the current political climate and voter sentiment more accurately than polls that were conducted a year ago, or more. In @fig-pollrecency we see that the majority of polls were conducted more recently than not, however polls date back until the last presidential election in 2020. Lastly, **NumericGrade** is a numerical assessment of the pollster's reliability. Our dataset displays polls that tend to have a higher numeric grade as depicted in @fig-numericgrade.
 
 While **CandidateName** is not a predictor variable within the model, it serves as a filter for the predictions being analyzed. This allows us to compare between the two primary candidates—Donald Trump and Kamala Harris.
+
+@fig-corrmatrix reveals relationships among the key variables in the dataset. The strong negative correlation between PollScore and NumericGrade (-0.89) indicates that as the PollScore of the pollster decreases (lower PollScore values are better), the reliability of the pollster increases (higher NumericGrade values are preferable). This shows that more credible pollsters are likely to be more reliable, which makes sense given the context.
+
+PollRecency exhibits a weak positive correlation with SampleSize (0.07) and Percentage (0.23), suggesting that more recent polls are slightly associated with a larger number of respondents and may result in higher outcome percentages (which may be due to a reduction in the number of candidates as the election grows closer). However, the correlation with PollScore is very weak (-0.05), indicating that the recency of polls does not significantly impact their credibility or reliability.
+
+Percentage, as the outcome variable, shows a weak positive correlation with SampleSize (0.16), suggesting that larger sample sizes may be associated with higher percentages, although the effect is modest. There is a slight negative correlation with PollScore (-0.02), reinforcing the notion that higher percentages do not consistently relate to the reliability of the pollsters.
 
 # Model
 
@@ -393,11 +399,32 @@ ggplot(cleaned_data, aes(x = SampleSize)) +
 ```
 
 ```{r}
+#| label: fig-numericgrade
+#| fig-cap: The distribution of numeric grades assigned to each poll
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+ggplot(cleaned_data, aes(x = NumericGrade)) +
+  geom_histogram(bins = 30,
+                 fill = "purple",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Numeric Grade",
+       x = "Numeric Grade", 
+       y = "Frequency")+
+  theme_minimal()
+```
+
+```{r}
 #| label: fig-percentage
 #| fig-cap: The distribution of what percentage of support a candidate recieves in a poll
 #| echo: false
 #| eval: true
 #| warning: false
+#| 
+#| 
 #| message: false
 ggplot(cleaned_data, aes(x = Percentage)) +
   geom_histogram(bins = 30,
@@ -445,16 +472,22 @@ ggplot(combined_data, aes(x = CandidateName,
 ```
 
 ```{r}
-#| label: fig-statepercentage
-#| fig-cap: The percentage of support seen by state
+#| label: fig-statesample
+#| fig-cap: The number of polls conducted in each state.
 #| echo: false
 #| eval: true
 #| warning: false
 #| message: false
-ggplot(cleaned_data, aes(x = State, y = Percentage)) +
-  geom_boxplot() +
-  labs(title = "Percentage by State", x = "State", y = "Percentage") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6)) 
+
+poll_counts <- cleaned_data %>%
+  group_by(State) %>%
+  summarise(Count = n())
+
+ggplot(poll_counts, aes(x = State, y = Count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Polls by State", x = "State", y = "Number of Polls") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6))
+
 ```
 
 ```{r}
@@ -465,12 +498,31 @@ ggplot(cleaned_data, aes(x = State, y = Percentage)) +
 #| warning: false
 #| message: false
 numerical_data <- cleaned_data %>%
-  select(PollScore, SampleSize, Percentage)
+  select(PollScore, SampleSize, PollRecency, NumericGrade)
 
 correlation_matrix <- cor(numerical_data, use = "complete.obs")
 
 library(ggcorrplot)
 ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
+```
+
+```{r}
+#| label: fig-pollrecency
+#| fig-cap: The distribution of how recent a poll was conducted
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+ggplot(cleaned_data, aes(x = PollRecency)) +
+  geom_histogram(bins = 30,
+                 fill = "pink",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Poll Recency",
+       x = "PollRecency", 
+       y = "Frequency")+
+  theme_minimal()
 ```
 
 \newpage
