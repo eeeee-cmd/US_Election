@@ -41,6 +41,8 @@ library(janitor)
 library(purrr)
 library(knitr)
 library(kableExtra)
+
+cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet"))
 ```
 
 # Introduction
@@ -69,13 +71,168 @@ To address instances where the original data referenced Joe Biden instead of Kam
 
 The main outcome variable of interest is the Percentage of support each candidate has in a given poll, which represents the proportion of respondents who favor one candidate over the other. This variable is crucial for estimating both the popular vote and Electoral College outcomes. We see a bimodal distribution in @fig-percentage. This indicates that candidates are either recieveing very high percentages of support or very low percentages of support. When we pull out Harris and Trump and view their distributions versus all candidates in @fig-candidatepercentage, we see that these two candidates see statistically high percentages of support, indicating they are leading the polls.
 
+```{r}
+#| label: fig-percentage
+#| fig-cap: The distribution of what percentage of support a candidate recieves in a poll
+#| echo: false
+#| eval: true
+#| warning: false
+#| 
+#| 
+#| message: false
+ggplot(cleaned_data, aes(x = Percentage)) +
+  geom_histogram(bins = 30,
+                 fill = "orange",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Percentage", 
+       x = "Percentage",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+```{r}
+#| label: fig-candidatepercentage
+#| fig-cap: violin plot displaying the percentage of support Harris and Trump receive compared to all candidates
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+harris_trump_selection <- cleaned_data %>%
+  filter(CandidateName %in% c("Donald Trump", 
+                              "Kamala Harris"))
+
+all_candidates <- cleaned_data %>%
+  mutate(CandidateName = "All Candidates")
+
+combined_data <- bind_rows(
+  harris_trump_selection,
+  all_candidates
+)
+
+ggplot(combined_data, aes(x = CandidateName, 
+                          y = Percentage, 
+                          fill = CandidateName)) +
+  geom_violin(alpha = 0.5) +
+  geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
+  labs(title = "Percentage by Candidate", 
+       x = "Candidate", 
+       y = "Percentage") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = c("grey", "salmon", "blue")) +
+  facet_wrap(~CandidateName, scales = "free_x") +
+  theme_minimal()
+```
+
 ## Predictor Variables
 
 In this analysis, several key predictors were identified to evaluate polling data effectively. The first variable, **PollScore**, is a numeric representation of the pollster's credibility, which stands for "Predictive Optimization of Latent Skill Level in Surveys, Considering Overall Record, Empirically." This score helps assess the error and bias associated with a specific pollster, where lower values (including negative numbers) indicate better credibility [@PollsterRating]. @fig-pollscoredistribution reveals whether the majority of pollsters tend to have high or low credibility scores. We see a higher concentration of negative scores, which suggests a trend toward more reputable pollsters in the dataset.
 
+```{r}
+#| label: fig-pollscoredistribution
+#| fig-cap: Distribution of Poll Scores by Candidate with denisty overlayed
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+Select_candidates_cleaned_data <- cleaned_data %>%
+  filter(CandidateName %in% c("Donald Trump", "Kamala Harris"))
+
+ggplot(Select_candidates_cleaned_data, aes(x = PollScore)) +
+  geom_histogram(aes(y = ..density..),
+                 bins = 30,
+                 fill = "blue",
+                 color = "black",
+                 alpha = 0.7) +
+    geom_density(color = "black", fill = "salmon", alpha = 0.6) +
+  labs(title = "Distribution of Poll Scores by Candidate",
+       x = "Poll Score", 
+       y = "Frequency") +
+  theme_minimal() +
+  facet_wrap(~ CandidateName)
+```
+
 Next, **SampleSize** refers to the number of respondents involved in each poll. A larger sample size generally enhances the reliability of poll results, as it is more likely to represent the broader population accurately. In @fig-samplesize we see that the vast majority of polls in the dataset have a sample size of less than 2500. As discussed in @sec-appx, this number maximizes efficiency and accuracy while minimizing the margin of error. The **State** variable denotes the U.S. state where the poll was conducted, in order to give geographical context. All 50 states are represented in this analysis, and Nebraska and Maine are broken up into electoral districts. Washington DC is not included in this dataset. @fig-statesample shows the number of polls conducted in each state. Battleground states notably have a higher number of polls conducted.
 
+```{r}
+#| label: fig-samplesize
+#| fig-cap: The distribution of sample sizes used in each poll
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+
+ggplot(cleaned_data, aes(x = SampleSize)) +
+  geom_histogram(bins = 30,
+                 fill = "green",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Sample Size",
+       x = "Sample Size", 
+       y = "Frequency")+
+  theme_minimal()
+```
+
+```{r}
+#| label: fig-statesample
+#| fig-cap: The number of polls conducted in each state.
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+poll_counts <- cleaned_data %>%
+  group_by(State) %>%
+  summarise(Count = n())
+
+ggplot(poll_counts, aes(x = State, y = Count)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Polls by State", x = "State", y = "Number of Polls") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6))
+```
+
 **PollRecency** is a variable we created to measure the number of days between the start date of the poll and the present. This is important as more recent polls tend to reflect the current political climate and voter sentiment more accurately than polls that were conducted a year ago, or more. In @fig-pollrecency we see that the majority of polls were conducted more recently than not, however polls date back until the last presidential election in 2020. Lastly, **NumericGrade** is a numerical assessment of the pollster's reliability. Our dataset displays polls that tend to have a higher numeric grade as depicted in @fig-numericgrade.
+
+```{r}
+#| label: fig-pollrecency
+#| fig-cap: The distribution of how recent a poll was conducted
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+ggplot(cleaned_data, aes(x = PollRecency)) +
+  geom_histogram(bins = 30,
+                 fill = "pink",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Poll Recency",
+       x = "PollRecency", 
+       y = "Frequency")+
+  theme_minimal()
+```
+
+```{r}
+#| label: fig-numericgrade
+#| fig-cap: The distribution of numeric grades assigned to each poll
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+ggplot(cleaned_data, aes(x = NumericGrade)) +
+  geom_histogram(bins = 30,
+                 fill = "purple",
+                 color = "black",
+                 alpha = 0.7) +
+  labs(title = "Distribution of Numeric Grade",
+       x = "Numeric Grade", 
+       y = "Frequency")+
+  theme_minimal()
+```
 
 While **CandidateName** is not a predictor variable within the model, it serves as a filter for the predictions being analyzed. This allows us to compare between the two primary candidates—Donald Trump and Kamala Harris.
 
@@ -84,6 +241,22 @@ While **CandidateName** is not a predictor variable within the model, it serves 
 PollRecency exhibits a weak positive correlation with SampleSize (0.07) and Percentage (0.23), suggesting that more recent polls are slightly associated with a larger number of respondents and may result in higher outcome percentages (which may be due to a reduction in the number of candidates as the election grows closer). However, the correlation with PollScore is very weak (-0.05), indicating that the recency of polls does not significantly impact their credibility or reliability.
 
 Percentage, as the outcome variable, shows a weak positive correlation with SampleSize (0.16), suggesting that larger sample sizes may be associated with higher percentages, although the effect is modest. There is a slight negative correlation with PollScore (-0.02), reinforcing the notion that higher percentages do not consistently relate to the reliability of the pollsters.
+
+```{r}
+#| label: fig-corrmatrix
+#| fig-cap: correlation between PollScore, the sample size of the poll, and the percentage of support for a candidate
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+numerical_data <- cleaned_data %>%
+  select(PollScore, SampleSize, PollRecency, NumericGrade)
+
+correlation_matrix <- cor(numerical_data, use = "complete.obs")
+
+library(ggcorrplot)
+ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
+```
 
 # Model
 
@@ -131,6 +304,10 @@ rmse_results %>%
   kable_styling(latex_options = c("striped", "scale_down"))
 
 ```
+
+# Results {#sec-result}
+
+The national averages for both candidates, as shown in @tbl-popularvote, show that Donald Trump is predicted to receive an average of 45.26% of the popular vote, which, when normalized, represents 50.96% of the total forecasted support, while Kamala Harris is predicted to receive 43.56% with a normalized value of 49.04%. In terms of electoral votes, @tbl-electoral shows that Donald Trump is projected to secure 302 votes, while Kamala Harris is expected to gain 233 votes.
 
 ```{r}
 #| label: tbl-popularvote
@@ -260,6 +437,8 @@ electoral_totals %>%
   kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
+The predicted outcomes for states where the margin is 4% or less are summarized in @tbl-statewinners. These states are known as our Battleground states (aka swing states). Donald Trump leads in several key battleground states, including Pennsylvania (45.68% for Trump vs. 44.83% for Harris), Georgia (46.94% vs. 43.49%), and Michigan (44.86% vs. 43.87%), while Kamala Harris secures leads in states such as Wisconsin (45.50% for Harris vs. 45.33% for Trump) and Minnesota (44.73% vs. 41.64%). @fig-predictedscoremap is a visual representation of the predicted outcomes for all states and how it would appear as an electoral map.
+
 ```{r}
 #| label: tbl-statewinners
 #| tbl-cap: The winners of each state, which determines who gets the electoral college votes for that state.
@@ -275,26 +454,48 @@ state_winners <- predictions_with_votes %>%
       TrumpPredicted > HarrisPredicted ~ "Donald Trump",
       HarrisPredicted > TrumpPredicted ~ "Kamala Harris",
       TRUE ~ "Tie"
-    )
-  )
-#print(state_winners, n=54)
+    ),
+    Margin = abs(TrumpPredicted - HarrisPredicted)
+  ) %>%
+  filter(Margin <= 4) 
 
 state_winners %>%
-  slice(1:53) %>%
+  select(State, TrumpPredicted, HarrisPredicted, Winner) %>%
   kable(
-    caption = "Predicted Percentage of Electoral Votes Per State",
+    caption = "Predicted Percentage of Electoral Votes Per State (Margin ≤ 4%)",
     col.names = c("State", "Trump Predicted %", "Harris Predicted %", "Winner"),
     digits = 2,
     booktabs = TRUE
   ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
+
 ```
 
-# Results {#sec-result}
+```{r}
+#| label: fig-predictedscoremap
+#| fig-cap: "Mapped Model-predicted outcomes for 2024 elections by State"
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
 
-The national averages for both candidates, as shown in @tbl-popularvote, show that Donald Trump is predicted to receive an average of 45.26% of the popular vote, which, when normalized, represents 50.96% of the total forecasted support, while Kamala Harris is predicted to receive 43.56% with a normalized value of 49.04%. In terms of electoral votes, @tbl-electoral shows that Donald Trump is projected to secure 302 votes, while Kamala Harris is expected to gain 233 votes.
+states_map <- map_data("state")
 
-The predicted outcomes for each state are summarized in @tbl-statewinners. Donald Trump leads in several key battleground states, including Pennsylvania (45.68% for Trump vs. 44.83% for Harris), Georgia (46.94% vs. 43.49%), and Michigan (44.86% vs. 43.87%), while Kamala Harris secures leads in states such as Wisconsin (45.50% for Harris vs. 45.33% for Trump) and Minnesota (44.73% vs. 41.64%). @fig-predictedscoremap is a visual representation of how these state outcomes appear on an electoral map.
+electoral_data <- predictions_with_votes
+electoral_data$State <- tolower(electoral_data$State) # matching state names
+
+merged_data <- inner_join(states_map, electoral_data, by = c("region" = "State"))
+
+map <- ggplot(merged_data, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = Winner), color = "white") +
+  scale_fill_manual(values = c("Donald Trump" = "red", "Kamala Harris" = "blue")) +
+  labs(title = "2024 US Presidential Election Predictions by State",
+       fill = "Predicted Winner") +
+  theme_void() +
+  theme(legend.position = "right")
+
+map
+```
 
 The polling data includes an average poll score of -0.379, with an average sample size of approximately 1,605 individuals per poll. The average percentage of support across all states for the candidates is 33.68%. This dataset contains a total of 15,829 individual polls, allowing for the model to be trained off a significant number of datapoints. The summary statistics are displayed in @tbl-sum.
 
@@ -325,204 +526,6 @@ summary_stats %>%
     booktabs= TRUE
   ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
-```
-
-```{r}
-#| label: fig-predictedscoremap
-#| fig-cap: "Mapped Model-predicted outcomes for 2024 elections by State"
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-states_map <- map_data("state")
-
-electoral_data <- predictions_with_votes
-electoral_data$State <- tolower(electoral_data$State) # matching state names
-
-merged_data <- inner_join(states_map, electoral_data, by = c("region" = "State"))
-
-map <- ggplot(merged_data, aes(x = long, y = lat, group = group)) +
-  geom_polygon(aes(fill = Winner), color = "white") +
-  scale_fill_manual(values = c("Donald Trump" = "red", "Kamala Harris" = "blue")) +
-  labs(title = "2024 US Presidential Election Predictions by State",
-       fill = "Predicted Winner") +
-  theme_void() +
-  theme(legend.position = "right")
-
-map
-```
-
-```{r}
-#| label: fig-pollscoredistribution
-#| fig-cap: Distribution of Poll Scores by Candidate with denisty overlayed
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-Select_candidates_cleaned_data <- cleaned_data %>%
-  filter(CandidateName %in% c("Donald Trump", "Kamala Harris"))
-
-ggplot(Select_candidates_cleaned_data, aes(x = PollScore)) +
-  geom_histogram(aes(y = ..density..),
-                 bins = 30,
-                 fill = "blue",
-                 color = "black",
-                 alpha = 0.7) +
-    geom_density(color = "black", fill = "salmon", alpha = 0.6) +
-  labs(title = "Distribution of Poll Scores by Candidate",
-       x = "Poll Score", 
-       y = "Frequency") +
-  theme_minimal() +
-  facet_wrap(~ CandidateName)
-```
-
-```{r}
-#| label: fig-samplesize
-#| fig-cap: The distribution of sample sizes used in each poll
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-
-ggplot(cleaned_data, aes(x = SampleSize)) +
-  geom_histogram(bins = 30,
-                 fill = "green",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Sample Size",
-       x = "Sample Size", 
-       y = "Frequency")+
-  theme_minimal()
-```
-
-```{r}
-#| label: fig-numericgrade
-#| fig-cap: The distribution of numeric grades assigned to each poll
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-ggplot(cleaned_data, aes(x = NumericGrade)) +
-  geom_histogram(bins = 30,
-                 fill = "purple",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Numeric Grade",
-       x = "Numeric Grade", 
-       y = "Frequency")+
-  theme_minimal()
-```
-
-```{r}
-#| label: fig-percentage
-#| fig-cap: The distribution of what percentage of support a candidate recieves in a poll
-#| echo: false
-#| eval: true
-#| warning: false
-#| 
-#| 
-#| message: false
-ggplot(cleaned_data, aes(x = Percentage)) +
-  geom_histogram(bins = 30,
-                 fill = "orange",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Percentage", 
-       x = "Percentage",
-       y = "Frequency") +
-  theme_minimal()
-```
-
-```{r}
-#| label: fig-candidatepercentage
-#| fig-cap: violin plot displaying the percentage of support Harris and Trump receive compared to all candidates
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-harris_trump_selection <- cleaned_data %>%
-  filter(CandidateName %in% c("Donald Trump", 
-                              "Kamala Harris"))
-
-all_candidates <- cleaned_data %>%
-  mutate(CandidateName = "All Candidates")
-
-combined_data <- bind_rows(
-  harris_trump_selection,
-  all_candidates
-)
-
-ggplot(combined_data, aes(x = CandidateName, 
-                          y = Percentage, 
-                          fill = CandidateName)) +
-  geom_violin(alpha = 0.5) +
-  geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
-  labs(title = "Percentage by Candidate", 
-       x = "Candidate", 
-       y = "Percentage") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_manual(values = c("grey", "salmon", "blue")) +
-  facet_wrap(~CandidateName, scales = "free_x") +
-  theme_minimal()
-```
-
-```{r}
-#| label: fig-statesample
-#| fig-cap: The number of polls conducted in each state.
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-poll_counts <- cleaned_data %>%
-  group_by(State) %>%
-  summarise(Count = n())
-
-ggplot(poll_counts, aes(x = State, y = Count)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Number of Polls by State", x = "State", y = "Number of Polls") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 6))
-
-```
-
-```{r}
-#| label: fig-corrmatrix
-#| fig-cap: correlation between PollScore, the sample size of the poll, and the percentage of support for a candidate
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-numerical_data <- cleaned_data %>%
-  select(PollScore, SampleSize, PollRecency, NumericGrade)
-
-correlation_matrix <- cor(numerical_data, use = "complete.obs")
-
-library(ggcorrplot)
-ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
-```
-
-```{r}
-#| label: fig-pollrecency
-#| fig-cap: The distribution of how recent a poll was conducted
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
-
-ggplot(cleaned_data, aes(x = PollRecency)) +
-  geom_histogram(bins = 30,
-                 fill = "pink",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Poll Recency",
-       x = "PollRecency", 
-       y = "Frequency")+
-  theme_minimal()
 ```
 
 \newpage
