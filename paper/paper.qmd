@@ -23,7 +23,7 @@ bibliography: references.bib
 
 # Install Packages if not downloaded:
 required_packages <- c(
-  "tidyverse", "sf", "here", "arrow", "ggplot2", "janitor", "purrr", "knitr", "kableExtra"
+  "tidyverse", "sf", "here", "arrow", "ggplot2", "janitor", "purrr", "knitr", "kableExtra", "ggcorrplot"
 )
 for (p in required_packages) {
   if (!require(p, character.only = TRUE)) {
@@ -31,6 +31,7 @@ for (p in required_packages) {
   }
 }
 
+# load libraries
 library(tidyverse)
 library(sf)
 library(dplyr)
@@ -41,7 +42,9 @@ library(janitor)
 library(purrr)
 library(knitr)
 library(kableExtra)
+library(ggcorrplot)
 
+# load data
 cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet"))
 ```
 
@@ -77,9 +80,10 @@ The main outcome variable of interest is the Percentage of support each candidat
 #| echo: false
 #| eval: true
 #| warning: false
-#|
-#|
 #| message: false
+
+
+# create plot for Distribution of Percentage
 ggplot(cleaned_data, aes(x = Percentage)) +
   geom_histogram(
     bins = 30,
@@ -103,6 +107,7 @@ ggplot(cleaned_data, aes(x = Percentage)) +
 #| warning: false
 #| message: false
 
+# filter for trump/harris
 harris_trump_selection <- cleaned_data %>%
   filter(CandidateName %in% c(
     "Donald Trump",
@@ -112,11 +117,13 @@ harris_trump_selection <- cleaned_data %>%
 all_candidates <- cleaned_data %>%
   mutate(CandidateName = "All Candidates")
 
+# create data frame with trump vs harris vs all candidates
 combined_data <- bind_rows(
   harris_trump_selection,
   all_candidates
 )
 
+# create plot for Distribution of Percentage by candidate
 ggplot(combined_data, aes(
   x = CandidateName,
   y = Percentage,
@@ -147,9 +154,11 @@ In this analysis, several key predictors were identified to evaluate polling dat
 #| warning: false
 #| message: false
 
+# filter for candidate
 Select_candidates_cleaned_data <- cleaned_data %>%
   filter(CandidateName %in% c("Donald Trump", "Kamala Harris"))
 
+# create plot for Distribution of Poll Scores by candidate
 ggplot(Select_candidates_cleaned_data, aes(x = PollScore)) +
   geom_histogram(aes(y = ..density..),
     bins = 30,
@@ -177,7 +186,7 @@ Next, **SampleSize** refers to the number of respondents involved in each poll. 
 #| warning: false
 #| message: false
 
-
+# create plot for distribution of sample sizes by candidate
 ggplot(cleaned_data, aes(x = SampleSize)) +
   geom_histogram(
     bins = 30,
@@ -201,10 +210,12 @@ ggplot(cleaned_data, aes(x = SampleSize)) +
 #| warning: false
 #| message: false
 
+# count polls
 poll_counts <- cleaned_data %>%
   group_by(State) %>%
   summarise(Count = n())
 
+# create plot for # of polls per state
 ggplot(poll_counts, aes(x = State, y = Count)) +
   geom_bar(stat = "identity") +
   labs(title = "Number of Polls by State", x = "State", y = "Number of Polls") +
@@ -221,6 +232,7 @@ ggplot(poll_counts, aes(x = State, y = Count)) +
 #| warning: false
 #| message: false
 
+# create plot for distribution of poll recency
 ggplot(cleaned_data, aes(x = PollRecency)) +
   geom_histogram(
     bins = 30,
@@ -244,6 +256,7 @@ ggplot(cleaned_data, aes(x = PollRecency)) +
 #| warning: false
 #| message: false
 
+# create plot for distribution of numeric grades
 ggplot(cleaned_data, aes(x = NumericGrade)) +
   geom_histogram(
     bins = 30,
@@ -274,12 +287,14 @@ Percentage, as the outcome variable, shows a weak positive correlation with Samp
 #| eval: true
 #| warning: false
 #| message: false
+
+# filter to numerical predictor variables
 numerical_data <- cleaned_data %>%
   select(PollScore, SampleSize, PollRecency, NumericGrade)
 
 correlation_matrix <- cor(numerical_data, use = "complete.obs")
 
-library(ggcorrplot)
+# create correlation matrix
 ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
 ```
 
@@ -320,8 +335,11 @@ The model was implemented using R, with out-of-sample testing and Root Mean Squa
 #| eval: true
 #| warning: false
 #| message: false
+
+# read data
 rmse_results <- read_parquet(here::here("data/analysis_data/rmse_results.parquet"))
 
+# create table for rmse results per model
 rmse_results %>%
   kable(
     caption = "RMSE Results for Candidate Models",
@@ -343,22 +361,26 @@ The national averages for both candidates, as shown in @tbl-popularvote, show th
 #| warning: false
 #| message: false
 
+# load data and model
 cleaned_data <- read_parquet(here::here("data/analysis_data/electoral_data.parquet"))
 lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
 lm_model_harris <- readRDS(here::here("models/lm_model_harris.rds"))
 
+# make predictions
 cleaned_data <- cleaned_data %>%
   mutate(
     PredictedTrumpPercentage = predict(lm_model_trump, newdata = cleaned_data),
     PredictedHarrisPercentage = predict(lm_model_harris, newdata = cleaned_data)
   )
 
+# average predictions
 results <- cleaned_data %>%
   summarise(
     NationalTrumpAverage = mean(PredictedTrumpPercentage, na.rm = TRUE),
     NationalHarrisAverage = mean(PredictedHarrisPercentage, na.rm = TRUE)
   )
 
+# normalize percentage
 total_percentage <- sum(results$NationalTrumpAverage, results$NationalHarrisAverage, na.rm = TRUE)
 results <- results %>%
   mutate(
@@ -366,6 +388,7 @@ results <- results %>%
     NormalizedHarrisPercentage = (NationalHarrisAverage / total_percentage) * 100
   )
 
+# display avg percent and normalized percent
 results %>%
   select(NationalTrumpAverage, NormalizedTrumpPercentage, NationalHarrisAverage, NormalizedHarrisPercentage) %>%
   kable(
@@ -385,12 +408,15 @@ results %>%
 #| warning: false
 #| message: false
 
+# load data and models
 cleaned_data <- read_parquet(here::here("data/analysis_data/electoral_data.parquet"))
 lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
 lm_model_harris <- readRDS(here::here("models/lm_model_harris.rds"))
 
+# list states
 unique_states <- distinct(cleaned_data, State)
 
+# variables for each state
 prediction_data <- cleaned_data %>%
   group_by(State) %>%
   summarise(
@@ -400,13 +426,14 @@ prediction_data <- cleaned_data %>%
     PollRecency = mean(PollRecency, na.rm = TRUE),
     .groups = "drop"
   )
-
+# make predictions
 prediction_data <- prediction_data %>%
   mutate(
     TrumpPredicted = predict(lm_model_trump, newdata = prediction_data),
     HarrisPredicted = predict(lm_model_harris, newdata = prediction_data)
   )
 
+# assign electoral votes
 electoral_votes <- tibble(
   State = c(
     "Alabama", "Kentucky", "North Dakota", "Alaska", "Louisiana",
@@ -438,9 +465,11 @@ electoral_votes <- tibble(
   )
 )
 
+# join predictions to state and votes
 predictions_with_votes <- prediction_data %>%
   left_join(electoral_votes, by = "State")
 
+# determine who wins the state
 predictions_with_votes <- predictions_with_votes %>%
   mutate(
     Winner = case_when(
@@ -452,12 +481,14 @@ predictions_with_votes <- predictions_with_votes %>%
     HarrisElectoralVotes = if_else(Winner == "Kamala Harris", Votes, 0)
   )
 
+# count total electoral votes
 electoral_totals <- predictions_with_votes %>%
   summarise(
     TrumpTotalElectoralVotes = sum(TrumpElectoralVotes, na.rm = TRUE),
     HarrisTotalElectoralVotes = sum(HarrisElectoralVotes, na.rm = TRUE)
   )
 
+# display electoral votes
 electoral_totals %>%
   kable(
     caption = "Predicted Number of Electoral Votes for Donald Trump and Kamala Harris",
@@ -478,6 +509,7 @@ The predicted outcomes for states where the margin is 4% or less are summarized 
 #| warning: false
 #| message: false
 
+# determine percent breakdown by states where margin is less than or equal to 4
 state_winners <- predictions_with_votes %>%
   select(State, TrumpPredicted, HarrisPredicted) %>%
   mutate(
@@ -490,6 +522,7 @@ state_winners <- predictions_with_votes %>%
   ) %>%
   filter(Margin <= 4)
 
+# display battle ground states margin in table
 state_winners %>%
   select(State, TrumpPredicted, HarrisPredicted, Winner) %>%
   kable(
@@ -516,6 +549,7 @@ electoral_data$State <- tolower(electoral_data$State) # matching state names
 
 merged_data <- inner_join(states_map, electoral_data, by = c("region" = "State"))
 
+# map electoral votes to state
 map <- ggplot(merged_data, aes(x = long, y = lat, group = group)) +
   geom_polygon(aes(fill = Winner), color = "white") +
   scale_fill_manual(values = c("Donald Trump" = "red", "Kamala Harris" = "blue")) +
@@ -538,8 +572,11 @@ The polling data includes an average poll score of -0.379, with an average sampl
 #| eval: true
 #| warning: false
 #| message: false
+
+# load data
 cleaned_data <- read_parquet(here::here("data/analysis_data/president_polls_cleaned.parquet"))
 
+# determine summary stats
 summary_stats <- cleaned_data %>%
   summarise(
     AveragePollScore = mean(PollScore, na.rm = TRUE),
@@ -548,8 +585,7 @@ summary_stats <- cleaned_data %>%
     TotalPolls = n()
   )
 
-# print(summary_stats)
-
+# display summary stats
 summary_stats %>%
   kable(
     caption = "Summary Statistics of Model Results",
