@@ -87,21 +87,48 @@ CandidateName: The name of the candidate being polled (either Donald Trump or Ka
 
 # Model
 
-To predict the outcome of the 2024 U.S. Presidential election, we developed two linear regression models: one for Donald Trump and one for Kamala Harris. These models aim to estimate the percentage of support for each candidate based on the aforementioned predictor variables.
+To predict the outcome of the 2024 U.S. Presidential election, we developed two linear regression models: one for Kamala Harris and one for Donald Trump. These models aim to estimate the percentage of support for each candidate based on the aforementioned predictor variables.
 
 ## Model Set-Up {#sec-modset}
 
-This paper utilizes linear regression model: $$Percentage_i = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$ where, Percentage$_i$ represents the predicted support percentage for a candidate in a given poll.
+This paper utilizes linear regression models:
 
-$\beta_i$ are the coefficients of the model that quantify the impact of each predictor.
+$$Percentage_H = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$
 
-$\epsilon_i$ is the error term.
+$$Percentage_T = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$In this model, $Percentage$ represents the predicted support percentage for a candidate in a given poll. $Percentage_H$ and $Percentage_T$ represent the predicted support for Harris and Trump respectively. Each predictor variable is carefully selected to capture critical factors influencing voter support, with coefficients $\beta_i$ representing the strength of each factor's impact. The error term $\epsilon_i$ accounts for random variability not explained by the model.
 
-The results from these models are aggregated to compute the predicted percentage of support for each candidate in each state. Based on these percentages, we forecast the likely winner of the state’s electoral votes.
+For a more granular analysis, separate linear regression models were constructed for each of the two primary candidates, Harris and Trump, to predict their state-by-state poll percentages. These models allow for a detailed view of each candidate’s performance across states. Based on these percentages, we forecast the likely winner of the popular vote as well as the state’s electoral votes. These models filter for $CandidateName$ since the model is candidate-specific.
+
+As defined in [@sec-data], each predictor variable has been chosen to reflect characteristics that influence election polling.
 
 ## Model Justification {#sec-modjust}
 
-This model was chosen for its balance between simplicity and predictive power. Linear regression allows us to capture relationships between polling quality, sample size, and recency, while still providing interpretable coefficients. Given the nature of polling data, this approach is both appropriate and commonly used in election forecasting. The model was validated using out-of-sample testing and Root Mean Square Error to ensure predictive accuracy.
+While other complex models could be appropriate in this instance, these models were chosen for its balance between simplicity and predictive power. Linear regression allows us to capture relationships between polling quality, sample size, and recency, while still providing interpretable coefficients. Given the nature of polling data, this approach is both appropriate and commonly used in election forecasting. A linear model allows us to directly interpret the influence of each predictor on voter support.
+
+## Assumptions and Limitations
+
+This model operates under several assumptions, including that relationships between predictors and outcomes are linear, errors are normally distributed, and predictors are not excessively collinear. Potential limitations include the fact that linear regression may oversimplify relationships in polling data, especially if interactions between predictors exist. Furthermore, as the model relies on historical polling data, it assumes that past trends are indicative of future behavior, which may not hold true if significant political events alter voter preferences unexpectedly, as discussed in [@sec-discussion].
+
+## Model Validation
+
+The model was implemented using R, with out-of-sample testing and Root Mean Square Error (RMSE) calculations applied to assess predictive accuracy as predicted in @tbl-rmse. By splitting the data into training and test sets, we evaluated how well the model performs on unseen data. This approach helps ensure that the model generalizes effectively to new data and avoids overfitting.
+
+```{r}
+#| label: tbl-rmse
+#| tbl-cap: The RMSE for each model
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+rmse_results <- read_parquet(here::here("data/analysis_data/rmse_results.parquet"))
+
+rmse_results %>%
+  kable(caption = "RMSE Results for Candidate Models",
+        col.names = c("Model", "Root Mean Squared Error (RMSE)"),
+        digits = 2) %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
+
+```
 
 ```{r}
 #| label: tbl-popularvote
@@ -111,31 +138,37 @@ This model was chosen for its balance between simplicity and predictive power. L
 #| warning: false
 #| message: false
 
-cleaned_data <- read_parquet(here::here("data/analysis_data/model_data.parquet"))
-lm_model <- readRDS(here::here("models/lm_model.rds"))
+cleaned_data <- read_parquet(here::here("data/analysis_data/electoral_data.parquet"))
+lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
+lm_model_harris <- readRDS(here::here("models/lm_model_harris.rds"))
 
 cleaned_data <- cleaned_data %>%
-  mutate(PredictedPercentage = predict(lm_model, newdata = cleaned_data))
+  mutate(PredictedTrumpPercentage = predict(lm_model_trump, newdata = cleaned_data),
+         PredictedHarrisPercentage = predict(lm_model_harris, newdata = cleaned_data))
 
 results <- cleaned_data %>%
-  group_by(CandidateName) %>%
-  summarise(AveragePredictedPercentage = mean(PredictedPercentage, na.rm = TRUE)) %>%
-  arrange(desc(AveragePredictedPercentage)) %>%
-  filter(AveragePredictedPercentage > 0)
+  summarise(
+    NationalTrumpAverage = mean(PredictedTrumpPercentage, na.rm = TRUE),
+    NationalHarrisAverage = mean(PredictedHarrisPercentage, na.rm = TRUE)
+  )
 
-total_percentage <- sum(results$AveragePredictedPercentage, na.rm = TRUE)
-
+total_percentage <- sum(results$NationalTrumpAverage, results$NationalHarrisAverage, na.rm = TRUE)
 results <- results %>%
-  mutate(NormalizedPercentage = (AveragePredictedPercentage / total_percentage) * 100)
+  mutate(
+    NormalizedTrumpPercentage = (NationalTrumpAverage / total_percentage) * 100,
+    NormalizedHarrisPercentage = (NationalHarrisAverage / total_percentage) * 100
+  )
 
 results %>%
+  select(NationalTrumpAverage, NormalizedTrumpPercentage, NationalHarrisAverage, NormalizedHarrisPercentage) %>%
   kable(
-    caption = "Predicted Percentage Vote for Donald Trump and Kamala Harris",
-    col.names = c("Candidate Name", "Average Predicted Percentage", "Normalized Percentage"),
+    caption = "Predicted National Popular Vote for Donald Trump and Kamala Harris",
+    col.names = c("Trump Average Predicted %", "Trump Normalized %", "Harris Average Predicted %", "Harris Normalized %"),
     digits = 2,
     booktabs = TRUE
   ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
+
 ```
 
 ```{r}
@@ -218,7 +251,7 @@ electoral_totals <- predictions_with_votes %>%
 electoral_totals %>%
   kable(
     caption = "Predicted Number of Electoral Votes for Donald Trump and Kamala Harris",
-    col.names = c("Trumps Total Electoral Votes", "Harriss Total Electoral Votes"),
+    col.names = c("Trumps Total Electoral Votes", "Harris Total Electoral Votes"),
     digits = 2,
     booktabs = TRUE
   ) %>%
@@ -257,7 +290,7 @@ state_winners %>%
 
 # Results {#sec-result}
 
-The model results (see Appendix for details) show a clear distribution of support for both candidates across various states. The predicted percentages of support were normalized to ensure they summed up to 100%. After computing these results, we forecast that Donald Trump is likely to win 302 electoral votes, while Kamala Harris is expected to secure 233 electoral votes.
+The model results show a clear distribution of support for both candidates across various states. The predicted percentages of support were normalized to ensure they summed up to 100%. After computing these results, we forecast that Donald Trump is likely to win 302 electoral votes, while Kamala Harris is expected to secure 233 electoral votes.
 
 ```{r}
 #| label: tbl-sum
