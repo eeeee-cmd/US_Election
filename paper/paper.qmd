@@ -24,7 +24,7 @@ bibliography: references.bib
 # Install Packages if not downloaded:
 required_packages <- c(
   "tidyverse", "sf", "here", "arrow", "ggplot2", "janitor", "purrr", "knitr", "kableExtra"
-) 
+)
 for (p in required_packages) {
   if (!require(p, character.only = TRUE)) {
     install.packages(p, character.only = TRUE)
@@ -77,17 +77,21 @@ The main outcome variable of interest is the Percentage of support each candidat
 #| echo: false
 #| eval: true
 #| warning: false
-#| 
-#| 
+#|
+#|
 #| message: false
 ggplot(cleaned_data, aes(x = Percentage)) +
-  geom_histogram(bins = 30,
-                 fill = "orange",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Percentage", 
-       x = "Percentage",
-       y = "Frequency") +
+  geom_histogram(
+    bins = 30,
+    fill = "orange",
+    color = "black",
+    alpha = 0.7
+  ) +
+  labs(
+    title = "Distribution of Percentage",
+    x = "Percentage",
+    y = "Frequency"
+  ) +
   theme_minimal()
 ```
 
@@ -100,8 +104,10 @@ ggplot(cleaned_data, aes(x = Percentage)) +
 #| message: false
 
 harris_trump_selection <- cleaned_data %>%
-  filter(CandidateName %in% c("Donald Trump", 
-                              "Kamala Harris"))
+  filter(CandidateName %in% c(
+    "Donald Trump",
+    "Kamala Harris"
+  ))
 
 all_candidates <- cleaned_data %>%
   mutate(CandidateName = "All Candidates")
@@ -111,14 +117,18 @@ combined_data <- bind_rows(
   all_candidates
 )
 
-ggplot(combined_data, aes(x = CandidateName, 
-                          y = Percentage, 
-                          fill = CandidateName)) +
+ggplot(combined_data, aes(
+  x = CandidateName,
+  y = Percentage,
+  fill = CandidateName
+)) +
   geom_violin(alpha = 0.5) +
   geom_boxplot(width = 0.1, color = "black", outlier.shape = NA) +
-  labs(title = "Percentage by Candidate", 
-       x = "Candidate", 
-       y = "Percentage") +
+  labs(
+    title = "Percentage by Candidate",
+    x = "Candidate",
+    y = "Percentage"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_manual(values = c("grey", "salmon", "blue")) +
   facet_wrap(~CandidateName, scales = "free_x") +
@@ -142,16 +152,19 @@ Select_candidates_cleaned_data <- cleaned_data %>%
 
 ggplot(Select_candidates_cleaned_data, aes(x = PollScore)) +
   geom_histogram(aes(y = ..density..),
-                 bins = 30,
-                 fill = "blue",
-                 color = "black",
-                 alpha = 0.7) +
-    geom_density(color = "black", fill = "salmon", alpha = 0.6) +
-  labs(title = "Distribution of Poll Scores by Candidate",
-       x = "Poll Score", 
-       y = "Frequency") +
+    bins = 30,
+    fill = "blue",
+    color = "black",
+    alpha = 0.7
+  ) +
+  geom_density(color = "black", fill = "salmon", alpha = 0.6) +
+  labs(
+    title = "Distribution of Poll Scores by Candidate",
+    x = "Poll Score",
+    y = "Frequency"
+  ) +
   theme_minimal() +
-  facet_wrap(~ CandidateName)
+  facet_wrap(~CandidateName)
 ```
 
 Next, **SampleSize** refers to the number of respondents involved in each poll. A larger sample size generally enhances the reliability of poll results, as it is more likely to represent the broader population accurately. In @fig-samplesize we see that the vast majority of polls in the dataset have a sample size of less than 2500. As discussed in @sec-appx, this number maximizes efficiency and accuracy while minimizing the margin of error. The **State** variable denotes the U.S. state where the poll was conducted, in order to give geographical context. All 50 states are represented in this analysis, and Nebraska and Maine are broken up into electoral districts. Washington DC is not included in this dataset. @fig-statesample shows the number of polls conducted in each state. Battleground states notably have a higher number of polls conducted.
@@ -166,13 +179,17 @@ Next, **SampleSize** refers to the number of respondents involved in each poll. 
 
 
 ggplot(cleaned_data, aes(x = SampleSize)) +
-  geom_histogram(bins = 30,
-                 fill = "green",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Sample Size",
-       x = "Sample Size", 
-       y = "Frequency")+
+  geom_histogram(
+    bins = 30,
+    fill = "green",
+    color = "black",
+    alpha = 0.7
+  ) +
+  labs(
+    title = "Distribution of Sample Size",
+    x = "Sample Size",
+    y = "Frequency"
+  ) +
   theme_minimal()
 ```
 
@@ -205,13 +222,17 @@ ggplot(poll_counts, aes(x = State, y = Count)) +
 #| message: false
 
 ggplot(cleaned_data, aes(x = PollRecency)) +
-  geom_histogram(bins = 30,
-                 fill = "pink",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Poll Recency",
-       x = "PollRecency", 
-       y = "Frequency")+
+  geom_histogram(
+    bins = 30,
+    fill = "pink",
+    color = "black",
+    alpha = 0.7
+  ) +
+  labs(
+    title = "Distribution of Poll Recency",
+    x = "PollRecency",
+    y = "Frequency"
+  ) +
   theme_minimal()
 ```
 
@@ -224,13 +245,17 @@ ggplot(cleaned_data, aes(x = PollRecency)) +
 #| message: false
 
 ggplot(cleaned_data, aes(x = NumericGrade)) +
-  geom_histogram(bins = 30,
-                 fill = "purple",
-                 color = "black",
-                 alpha = 0.7) +
-  labs(title = "Distribution of Numeric Grade",
-       x = "Numeric Grade", 
-       y = "Frequency")+
+  geom_histogram(
+    bins = 30,
+    fill = "purple",
+    color = "black",
+    alpha = 0.7
+  ) +
+  labs(
+    title = "Distribution of Numeric Grade",
+    x = "Numeric Grade",
+    y = "Frequency"
+  ) +
   theme_minimal()
 ```
 
@@ -298,11 +323,12 @@ The model was implemented using R, with out-of-sample testing and Root Mean Squa
 rmse_results <- read_parquet(here::here("data/analysis_data/rmse_results.parquet"))
 
 rmse_results %>%
-  kable(caption = "RMSE Results for Candidate Models",
-        col.names = c("Model", "Root Mean Squared Error (RMSE)"),
-        digits = 2) %>%
+  kable(
+    caption = "RMSE Results for Candidate Models",
+    col.names = c("Model", "Root Mean Squared Error (RMSE)"),
+    digits = 2
+  ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
-
 ```
 
 # Results {#sec-result}
@@ -322,8 +348,10 @@ lm_model_trump <- readRDS(here::here("models/lm_model_trump.rds"))
 lm_model_harris <- readRDS(here::here("models/lm_model_harris.rds"))
 
 cleaned_data <- cleaned_data %>%
-  mutate(PredictedTrumpPercentage = predict(lm_model_trump, newdata = cleaned_data),
-         PredictedHarrisPercentage = predict(lm_model_harris, newdata = cleaned_data))
+  mutate(
+    PredictedTrumpPercentage = predict(lm_model_trump, newdata = cleaned_data),
+    PredictedHarrisPercentage = predict(lm_model_harris, newdata = cleaned_data)
+  )
 
 results <- cleaned_data %>%
   summarise(
@@ -347,7 +375,6 @@ results %>%
     booktabs = TRUE
   ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
-
 ```
 
 ```{r}
@@ -371,7 +398,7 @@ prediction_data <- cleaned_data %>%
     SampleSize = mean(SampleSize, na.rm = TRUE),
     NumericGrade = mean(NumericGrade, na.rm = TRUE),
     PollRecency = mean(PollRecency, na.rm = TRUE),
-    .groups = 'drop'
+    .groups = "drop"
   )
 
 prediction_data <- prediction_data %>%
@@ -381,30 +408,34 @@ prediction_data <- prediction_data %>%
   )
 
 electoral_votes <- tibble(
-  State = c("Alabama", "Kentucky", "North Dakota", "Alaska", "Louisiana", 
-            "Ohio", "Arizona", "Maine", "Oklahoma", "Arkansas", 
-            "Maryland", "Oregon", "California", "Massachusetts", "Pennsylvania", 
-            "Colorado", "Michigan", "Rhode Island", "Connecticut", "Minnesota", 
-            "South Carolina", "Delaware", "Mississippi", "South Dakota", 
-            "District of Columbia", "Missouri", "Tennessee", "Florida", 
-            "Montana", "Texas", "Georgia", "Nebraska", "Utah", 
-            "Hawaii", "Nevada", "Vermont", "Idaho", "New Hampshire", 
-            "Virginia", "Illinois", "New Jersey", "Washington", 
-            "Indiana", "New Mexico", "West Virginia", "Iowa", 
-            "New York", "Wisconsin", "Kansas", "North Carolina", 
-            "Wyoming"),
-  Votes = c(9, 8, 3, 3, 8, 
-            17, 11, 4, 7, 6, 
-            10, 8, 54, 11, 19, 
-            10, 15, 4, 7, 10, 
-            9, 3, 6, 3, 
-            3, 10, 11, 30, 
-            4, 40, 16, 5, 6, 
-            4, 6, 3, 4, 4, 
-            13, 19, 14, 12, 
-            11, 5, 4, 6, 
-            28, 10, 6, 16, 
-            3)
+  State = c(
+    "Alabama", "Kentucky", "North Dakota", "Alaska", "Louisiana",
+    "Ohio", "Arizona", "Maine", "Oklahoma", "Arkansas",
+    "Maryland", "Oregon", "California", "Massachusetts", "Pennsylvania",
+    "Colorado", "Michigan", "Rhode Island", "Connecticut", "Minnesota",
+    "South Carolina", "Delaware", "Mississippi", "South Dakota",
+    "District of Columbia", "Missouri", "Tennessee", "Florida",
+    "Montana", "Texas", "Georgia", "Nebraska", "Utah",
+    "Hawaii", "Nevada", "Vermont", "Idaho", "New Hampshire",
+    "Virginia", "Illinois", "New Jersey", "Washington",
+    "Indiana", "New Mexico", "West Virginia", "Iowa",
+    "New York", "Wisconsin", "Kansas", "North Carolina",
+    "Wyoming"
+  ),
+  Votes = c(
+    9, 8, 3, 3, 8,
+    17, 11, 4, 7, 6,
+    10, 8, 54, 11, 19,
+    10, 15, 4, 7, 10,
+    9, 3, 6, 3,
+    3, 10, 11, 30,
+    4, 40, 16, 5, 6,
+    4, 6, 3, 4, 4,
+    13, 19, 14, 12,
+    11, 5, 4, 6,
+    28, 10, 6, 16,
+    3
+  )
 )
 
 predictions_with_votes <- prediction_data %>%
@@ -457,7 +488,7 @@ state_winners <- predictions_with_votes %>%
     ),
     Margin = abs(TrumpPredicted - HarrisPredicted)
   ) %>%
-  filter(Margin <= 4) 
+  filter(Margin <= 4)
 
 state_winners %>%
   select(State, TrumpPredicted, HarrisPredicted, Winner) %>%
@@ -468,7 +499,6 @@ state_winners %>%
     booktabs = TRUE
   ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
-
 ```
 
 ```{r}
@@ -489,8 +519,10 @@ merged_data <- inner_join(states_map, electoral_data, by = c("region" = "State")
 map <- ggplot(merged_data, aes(x = long, y = lat, group = group)) +
   geom_polygon(aes(fill = Winner), color = "white") +
   scale_fill_manual(values = c("Donald Trump" = "red", "Kamala Harris" = "blue")) +
-  labs(title = "2024 US Presidential Election Predictions by State",
-       fill = "Predicted Winner") +
+  labs(
+    title = "2024 US Presidential Election Predictions by State",
+    fill = "Predicted Winner"
+  ) +
   theme_void() +
   theme(legend.position = "right")
 
@@ -523,7 +555,7 @@ summary_stats %>%
     caption = "Summary Statistics of Model Results",
     col.names = c("Average Poll Score", "Average Sample Size", "Average Percentage", "Total Polls"),
     digits = 3,
-    booktabs= TRUE
+    booktabs = TRUE
   ) %>%
   kable_styling(latex_options = c("striped", "scale_down"))
 ```
