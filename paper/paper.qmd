@@ -62,7 +62,7 @@ The structure of the paper is as follows: [@sec-data] outlines the data sources 
 
 ## Overview
 
-The data used in this analysis comes from a combination of publicly available polling data for the 2024 U.S. Presidential election [@FiveThirtyEightPolls]. The analysis uses the statistical programming language R [@citeR] and several libraries, including `tidyverse` [@tidyverse], `janitor` [@janitor], `knitr` [@knitr], `dplyr` [@dplyr], `arrow` [@arrow], `purrr` [@purrr], and `here` [@here], for data manipulation. `ggplot2` [@ggplot] and `kableExtra` [@kableExtra] for visualization. The dataset covers various polls conducted across multiple states, capturing the support for each major candidate—Donald Trump and Kamala Harris—along with detailed attributes of the polls.
+The data used in this analysis comes from a combination of publicly available polling data for the 2024 U.S. Presidential election [@FiveThirtyEightPolls]. The analysis uses the statistical programming language R [@citeR] and several libraries, including `tidyverse` [@tidyverse], `janitor` [@janitor], `knitr` [@knitr], `dplyr` [@dplyr], `arrow` [@arrow], `purrr` [@purrr], `sf` [@sf], and `here` [@here] for data manipulation. `ggplot2` [@ggplot], `ggcorrplot` [@ggcorrplot] and `kableExtra` [@kableExtra] for visualization. The dataset covers various polls conducted across multiple states, capturing the support for each major candidate—Donald Trump and Kamala Harris—along with detailed attributes of the polls.
 
 ## Measurement
 
