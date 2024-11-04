@@ -65,8 +65,9 @@ test_results$date_logic <- test_that("Date logic", {
 
 # test if the election dates are within the valid range (2024-11-01 to 2024-11-08)
 test_results$election_date <- test_that("Election date range", {
-  expect_true(all(data$election_date >= as.Date("2024-11-01") & data$election_date <= as.Date("2024-11-08")), 
-              info = "Some election_dates are out of range (2024-11-01 to 2024-11-08).")
+  expect_true(all(data$election_date >= as.Date("2024-11-01") & data$election_date <= as.Date("2024-11-08")),
+    info = "Some election_dates are out of range (2024-11-01 to 2024-11-08)."
+  )
 })
 
 # test if the candidate parties are valid (only Party A, Party B, Party C are allowed)

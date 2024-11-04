@@ -19,18 +19,13 @@ cleaned_data <- cleaned_data %>%
     CandidateName = as.factor(CandidateName),
     State = as.factor(State),
     Pollster = as.factor(Pollster),
-    StartDate = as.Date(StartDate),
-    EndDate = as.Date(EndDate),
     Party = as.factor(Party),
     Methodology = as.factor(Methodology),
     NumericGrade = as.numeric(NumericGrade),
-    SampleSize = as.numeric(SampleSize)
+    SampleSize = as.numeric(SampleSize),
+    PollRecency = as.numeric(PollRecency)
   )
 
-# create a new variable called PollRecency
-# PollRecency measures how recently the poll was conducted (based on start date)
-cleaned_data <- cleaned_data %>%
-  mutate(PollRecency = as.numeric(Sys.Date() - StartDate))
 
 # only consider polls for Trump or Harris
 cleaned_data <- cleaned_data %>%
@@ -39,12 +34,12 @@ cleaned_data <- cleaned_data %>%
 
 # linear model for Donald Trump's poll percentage based on various predictors
 lm_model_trump <- lm(Percentage ~ PollScore + SampleSize + NumericGrade + PollRecency + State,
-                     data = cleaned_data %>% filter(CandidateName == "Donald Trump")
+  data = cleaned_data %>% filter(CandidateName == "Donald Trump")
 )
 
 # linear model for Kamala Harris' poll percentage based on various predictors
 lm_model_harris <- lm(Percentage ~ PollScore + SampleSize + NumericGrade + PollRecency + State,
-                      data = cleaned_data %>% filter(CandidateName == "Kamala Harris")
+  data = cleaned_data %>% filter(CandidateName == "Kamala Harris")
 )
 
 # save modified data for the model as a CSV + Parquet and save models as RDS

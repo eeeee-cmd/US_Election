@@ -4,7 +4,7 @@
 # Date:
 # Contact:
 # License: MIT
-# Pre-requisites: The `tidyverse`, 'janitor', 'here', 'arrow', and 'reshape2' packages
+# Pre-requisites: The `tidyverse`, 'janitor', 'here', and 'reshape2' packages
 # must be installed
 # Any other information needed? Make sure you are in the `US_Election_2024` rproj
 

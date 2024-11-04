@@ -33,17 +33,19 @@ cleaned_data <- cleaned_data %>%
   filter(CandidateName %in% c("Donald Trump", "Kamala Harris"))
 
 # split the data into training (70%) and testing (30%) sets
-set.seed(123)  # Set seed for reproducibility
+set.seed(123) # Set seed for reproducibility
 train_index <- createDataPartition(cleaned_data$CandidateName, p = 0.7, list = FALSE)
 train_data <- cleaned_data[train_index, ]
 test_data <- cleaned_data[-train_index, ]
 
 # fit linear regression models on the training set
 lm_model_trump <- lm(Percentage ~ PollScore + SampleSize + NumericGrade + PollRecency + State,
-                     data = train_data %>% filter(CandidateName == "Donald Trump"))
+  data = train_data %>% filter(CandidateName == "Donald Trump")
+)
 
 lm_model_harris <- lm(Percentage ~ PollScore + SampleSize + NumericGrade + PollRecency + State,
-                      data = train_data %>% filter(CandidateName == "Kamala Harris"))
+  data = train_data %>% filter(CandidateName == "Kamala Harris")
+)
 
 # make predictions on the testing set for each model
 predictions_trump <- predict(lm_model_trump, newdata = test_data %>% filter(CandidateName == "Donald Trump"))
@@ -64,4 +66,3 @@ rmse_results <- tibble(
 )
 
 write_parquet(rmse_results, here::here("data/analysis_data/rmse_results.parquet"))
-

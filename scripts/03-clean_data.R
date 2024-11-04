@@ -77,11 +77,14 @@ cleaned_data <- tryCatch(
   }
 )
 
-# save cleaned data as new csv if successful, print error if not
+# add poll recency
+cleaned_data <- cleaned_data %>%
+  mutate(PollRecency = as.numeric(Sys.Date() - StartDate))
+
+# save cleaned data as new csv and parquet if successful, print error if not
 if (!is.null(cleaned_data)) {
   write_csv(cleaned_data, here::here("data/analysis_data/president_polls_cleaned.csv"))
   write_parquet(cleaned_data, here::here("data/analysis_data/president_polls_cleaned.parquet"))
-  
   print(head(cleaned_data))
 } else {
   message("Cleaned data not available for saving due to an error.")
