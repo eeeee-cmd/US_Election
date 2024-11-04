@@ -93,7 +93,7 @@ ggplot(cleaned_data, aes(x = Percentage)) +
 
 ```{r}
 #| label: fig-candidatepercentage
-#| fig-cap: violin plot displaying the percentage of support Harris and Trump receive compared to all candidates
+#| fig-cap: Violin plot displaying the percentage of support Harris and Trump receive compared to all candidates
 #| echo: false
 #| eval: true
 #| warning: false
@@ -198,7 +198,7 @@ ggplot(poll_counts, aes(x = State, y = Count)) +
 
 ```{r}
 #| label: fig-pollrecency
-#| fig-cap: The distribution of how recent a poll was conducted
+#| fig-cap: The distribution of how recently a poll was conducted
 #| echo: false
 #| eval: true
 #| warning: false
@@ -244,7 +244,7 @@ Percentage, as the outcome variable, shows a weak positive correlation with Samp
 
 ```{r}
 #| label: fig-corrmatrix
-#| fig-cap: correlation between PollScore, the sample size of the poll, and the percentage of support for a candidate
+#| fig-cap: The correlation between the numerical predictor variables and the percentage of support for a candidate
 #| echo: false
 #| eval: true
 #| warning: false
@@ -501,7 +501,7 @@ The polling data includes an average poll score of -0.379, with an average sampl
 
 ```{r}
 #| label: tbl-sum
-#| tbl-cap: summary statistics for the cleaned data
+#| tbl-cap: Summary statistics for the cleaned poll data
 #| echo: false
 #| eval: true
 #| warning: false
@@ -623,7 +623,152 @@ In terms of budget allocation, we will designate funds as follows:
 5.  Data Analysis and Reporting: \$10,000
     -   This portion of the budget is reserved for the costs related to analyzing the collected data and reporting the findings. This may include hiring data analysts or consultants who specialize in statistical analysis and survey data interpretation. The funds will also cover software tools necessary for data analysis, as well as the creation of visualizations and reports to communicate the results effectively.
 
+## Idealized Survey
+
 An example of the survey can be found at this link: <https://forms.gle/igzK683kHLYytGvu8>
+
+**2024 US Presidential Election Forecast Survey**
+
+**Conducted by:** Sophia Brothers, Deyi Kong, and Rayan Awad Alim\
+**Contact:** sophia.brothers\@mail.utoronto.ca
+
+Welcome, and thank you for taking part in the **2024 US Presidential Election Forecast Survey**. Your participation will help us gain insights into voter preferences, influential issues, and factors shaping the election across all 50 states and Washington D.C. 
+
+As a thank you for your time, all survey respondents will be automatically entered into a sweepstakes, with a **chance to win \$500**. One winner will be selected from each state and Washington D.C.
+
+**Your responses will remain strictly confidential** and anonymous, and any data collected will be securely stored and used solely for academic and analytical purposes. No identifying information will be connected to your survey responses.
+
+------------------------------------------------------------------------
+
+**Section 1: Demographics**
+
+**State of Residence**\
+- \[List of all 50 states and Washington D.C.\]
+
+**Zip Code**
+
+**Age**\
+1. 18-24\
+2. 25-34\
+3. 35-44\
+4. 45-54\
+5. 55-64\
+6. 65+
+
+**Gender**\
+1. Male\
+2. Female\
+3. Non-binary/Other\
+4. Prefer not to say
+
+**Race/Ethnicity**\
+- White\
+- Black or African American\
+- Hispanic or Latino\
+- Asian\
+- Native American or Alaska Native\
+- Native Hawaiian or Pacific Islander\
+- Other\
+- Prefer not to say
+
+**Income Level**\
+- Less than \$25,000\
+- \$25,000 - \$49,999\
+- \$50,000 - \$74,999\
+- \$75,000 - \$99,999\
+- \$100,000 - \$149,999\
+- \$150,000 or more
+
+**Highest Level of Education**\
+- Less than high school\
+- High school diploma or equivalent\
+- Some college, no degree\
+- Associate degree\
+- Bachelor’s degree\
+- Graduate or professional degree
+
+**Party Affiliation**\
+- Republican\
+- Democrat\
+- Independent\
+- Other
+
+------------------------------------------------------------------------
+
+**Section 2: Voter Registration**
+
+**Are you registered to vote in the upcoming election?**\
+- Yes\
+- No
+
+**How likely are you to vote in the upcoming election?**\
+1 (Very Unlikely) to 5 (Very Likely)
+
+------------------------------------------------------------------------
+
+**Section 3: Voting Intent**
+
+**If the election were held today, who would you vote for?**\
+- Kamala Harris\
+- Donald Trump\
+- Other
+
+**How certain are you of your choice?**\
+1 (Not Certain at All) to 5 (Very Certain)
+
+**How likely are you to vote on election day?**\
+1 (Not Likely) to 5 (Very Likely)
+
+------------------------------------------------------------------------
+
+**Section 4: Key Issues**
+
+**Rank the most important issues influencing your vote:**\
+- Economy\
+- Healthcare\
+- Immigration\
+- Climate Change\
+- National Security\
+- Social Issues (e.g., LGBTQ+ rights, abortion)\
+- Education\
+- Taxes\
+- Gun Control\
+- Foreign Policy\
+- Public Safety\
+- Infrastructure
+
+------------------------------------------------------------------------
+
+**Section 5: Candidate Perception**
+
+**Rate the following candidates on Trustworthiness:**\
+- Kamala Harris: Very low, Low, Neutral, High, Very high\
+- Donald Trump: Very low, Low, Neutral, High, Very high
+
+**Rate the following candidates on Competence:**\
+- Kamala Harris: Very low, Low, Neutral, High, Very high\
+- Donald Trump: Very low, Low, Neutral, High, Very high
+
+**Rate the following candidates on Leadership:**\
+- Kamala Harris: Very low, Low, Neutral, High, Very high\
+- Donald Trump: Very low, Low, Neutral, High, Very high
+
+------------------------------------------------------------------------
+
+**Section 6: Prior Voting History**
+
+**Did you vote in the last presidential election?**\
+- Yes\
+- No
+
+**If yes, who did you vote for?**\
+- Joe Biden\
+- Donald Trump\
+- Other
+
+------------------------------------------------------------------------
+
+Thank you for your time and participation! Your responses will help us understand the key issues shaping the upcoming election. As a reminder, all participants are automatically entered into a sweepstakes for a chance to win \$500, with one winner selected from each state and Washington D.C.
 
 \newpage
 
