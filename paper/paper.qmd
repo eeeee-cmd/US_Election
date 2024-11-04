@@ -1,6 +1,6 @@
 ---
 title: "Trump vs. Harris: A Data-Driven Forecast modeling the 2024 US Presidential Elections"
-subtitle: "A close race but Trump, trumps Harris"
+subtitle: "Trump trumps Harris to become the next President of the United States"
 author: 
   - Sophia Brothers
   - Deyi Kong
@@ -8,7 +8,7 @@ author:
 thanks: "Code and data are available at: [https://github.com/eeeee-cmd/US_Election/](https://github.com/eeeee-cmd/US_Election/)."
 date: today
 date-format: long
-abstract: "This paper predicts the 2024 U.S. Presidential election. We utilizes linear regression model deploying polling data and demographic factors to predict both popular vote and Electoral College outcomes. The findings indicate a close race between Donald Trump and Kamala Harris, and we predict Trump will secure the Electoral College due to projected victories in key swing states while Harris maintains a popular vote lead. The results emphasize the role of state-level dynamics, particularly in swing states, in determining election outcomes."
+abstract: "This paper predicts the 2024 U.S. Presidential election. We utilizes linear regression model deploying polling data and demographic factors to predict both popular vote and Electoral College outcomes. The findings indicate a close race between Donald Trump and Kamala Harris, and we predict Trump will secure the Electoral College and Popular Vote due to key wins in tight races for the Battleground States. The results emphasize the role of state-level dynamics, particularly in Battleground states, in determining election outcomes."
 format: pdf
 toc: true
 toc-depth: 3
@@ -290,11 +290,15 @@ state_winners %>%
 
 # Results {#sec-result}
 
-The model results show a clear distribution of support for both candidates across various states. The predicted percentages of support were normalized to ensure they summed up to 100%. After computing these results, we forecast that Donald Trump is likely to win 302 electoral votes, while Kamala Harris is expected to secure 233 electoral votes.
+The national averages for both candidates, as shown in @tbl-popularvote, show that Donald Trump is predicted to receive an average of 45.26% of the popular vote, which, when normalized, represents 50.96% of the total forecasted support, while Kamala Harris is predicted to receive 43.56% with a normalized value of 49.04%. In terms of electoral votes, @tbl-electoral shows that Donald Trump is projected to secure 302 votes, while Kamala Harris is expected to gain 233 votes.
+
+The predicted outcomes for each state are summarized in @tbl-statewinners. Donald Trump leads in several key battleground states, including Pennsylvania (45.68% for Trump vs. 44.83% for Harris), Georgia (46.94% vs. 43.49%), and Michigan (44.86% vs. 43.87%), while Kamala Harris secures leads in states such as Wisconsin (45.50% for Harris vs. 45.33% for Trump) and Minnesota (44.73% vs. 41.64%). @fig-predictedscoremap is a visual representation of how these state outcomes appear on an electoral map.
+
+The polling data includes an average poll score of -0.379, with an average sample size of approximately 1,605 individuals per poll. The average percentage of support across all states for the candidates is 33.68%. This dataset contains a total of 15,829 individual polls, allowing for the model to be trained off a significant number of datapoints. The summary statistics are displayed in @tbl-sum.
 
 ```{r}
 #| label: tbl-sum
-#| fig-cap: summary statistics for the cleaned data
+#| tbl-cap: summary statistics for the cleaned data
 #| echo: false
 #| eval: true
 #| warning: false
