@@ -22,4 +22,4 @@ The repo is structured as:
 
 ## Statement on LLM usage
 
-LLMs such as ChatGPT were used to help formulate the questions for the simulated survey, as well as for minor coding help. Full usage can be found on 'other/llm/usage.txt'.
+LLMs such as ChatGPT were used to help formulate the questions for the simulated survey, as well as for minor coding help. Full usage can be found on 'other/llm_usage/usage.txt'.
