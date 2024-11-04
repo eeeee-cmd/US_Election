@@ -71,21 +71,13 @@ The main outcome variable of interest is the Percentage of support each candidat
 
 ## Predictor Variables
 
-Key predictors include:
+In this analysis, several key predictors were identified to evaluate polling data effectively. The first variable, **PollScore**, is a numeric representation of the pollster's credibility, which stands for "Predictive Optimization of Latent Skill Level in Surveys, Considering Overall Record, Empirically." This score helps assess the error and bias associated with a specific pollster, where lower values (including negative numbers) indicate better credibility [@PollsterRating].
 
-PollScore: A numeric value that reflects the credibility of the pollster. Stands for "Predictive Optimization of Latent skill Level in Surveys, Considering Overall Record, Empirically." The error and bias we can attribute to a pollster. Negative numbers are better.
+Next, **SampleSize** refers to the number of respondents involved in each poll. A larger sample size generally enhances the reliability of poll results, as it is more likely to represent the broader population accurately. The **State** variable denotes the U.S. state where the poll was conducted, in order to give geographical context.
 
-SampleSize: The number of respondents in each poll.
+**PollRecency** is a variable we created to measure the number of days between the start date of the poll and the present. This is important as more recent polls tend to reflect the current political climate and voter sentiment more accurately than polls that were conducted a year ago, or more. Lastly, **NumericGrade** is a numerical assessment of the pollster's reliability.
 
-State: The U.S. state where the poll was conducted.
-
-PollRecency: The number of days between the start date of the poll and the present, which gives more weight to recent polls.
-
-NumericGrade: A numerical representation of the reliability of the pollster.
-
-Although not a variable in the model, this variable is used to filter predictions for the model:
-
-CandidateName: The name of the candidate being polled (either Donald Trump or Kamala Harris).
+While **CandidateName** is not a predictor variable within the model, it serves as a filter for the predictions being analyzed. This allows us to compare between the two primary candidates—Donald Trump and Kamala Harris.
 
 # Model
 
@@ -97,7 +89,9 @@ This paper utilizes linear regression models:
 
 $$Percentage_H = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$
 
-$$Percentage_T = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$In this model, $Percentage$ represents the predicted support percentage for a candidate in a given poll. $Percentage_H$ and $Percentage_T$ represent the predicted support for Harris and Trump respectively. Each predictor variable is carefully selected to capture critical factors influencing voter support, with coefficients $\beta_i$ representing the strength of each factor's impact. The error term $\epsilon_i$ accounts for random variability not explained by the model.
+$$Percentage_T = \beta_0 + \beta_1 Pollscore_i + \beta_2 SampleSize + \beta_3 Numeric Grade_i + \beta_4 State_i + \beta_5PollRecency + \epsilon_i$$
+
+In this model, $Percentage$ represents the predicted support percentage for a candidate in a given poll. $Percentage_H$ and $Percentage_T$ represent the predicted support for Harris and Trump respectively. Each predictor variable is carefully selected to capture critical factors influencing voter support, with coefficients $\beta_i$ representing the strength of each factor's impact. The error term $\epsilon_i$ accounts for random variability not explained by the model.
 
 For a more granular analysis, separate linear regression models were constructed for each of the two primary candidates, Harris and Trump, to predict their state-by-state poll percentages. These models allow for a detailed view of each candidate’s performance across states. Based on these percentages, we forecast the likely winner of the popular vote as well as the state’s electoral votes. These models filter for $CandidateName$ since the model is candidate-specific.
 
