@@ -559,6 +559,22 @@ Future research could better the model by incorporating live data updates and ad
 
 # Appendix {#sec-appx}
 
+## Data Cleaning Notes
+
+We began by importing the raw dataset using the read_csv function from the tidyverse package. To focus our analysis on more relevant variables, we selected specific columns, such as poll identifiers and polling metrics, omitting any unnecessary columns.
+
+We then renaming columns for clarity. For example, we changed pct to Percentage, making it easier for anyone working with the data to understand what each variable represents.
+
+We converted date data into date format since they were represented as strings in the raw dataset. This was done by using the mdy() function, after which we removed any rows with missing values for StartDate, EndDate, or ElectionDate to avoid issues later in our analysis.
+
+We also modified the CandidateName variable to attribute polls for Joe Biden to Kamala Harris, as Joe Biden dropped out of the race and Harris replaced him as the democratic nominee.
+
+We also created a new variable called PollRecency, which indicates how many days have passed since each poll started. This was done because as we get closer to election date, polls become more meaningful as they represent the most recent viewpoints of voters. 
+
+We also wrapped the cleaning process in a tryCatch block in order to mitigate any errors that arose throughout the cleaning process.
+
+After completing the cleaning, we saved the final dataset in both Parquet and CSV formats for later analysis.
+
 ## Pollster Methodology
 
 The New York Times/Siena College Poll was ranked the most accurate political pollster in the US following the 2022 midterm elections [@PollsterRating]. They received the max 538 rating of 3 stars, one of only four pollsters to do so. They also had a pollscore of -1.5, meaning they had the least amount of error and bias attributed to them of the 282 pollsters ranked by 538 [@PollsterRating].
