@@ -83,6 +83,8 @@ PollRecency: The number of days between the start date of the poll and the prese
 
 NumericGrade: A numerical representation of the reliability of the pollster.
 
+Although not a variable in the model, this variable is used to filter predictions for the model:
+
 CandidateName: The name of the candidate being polled (either Donald Trump or Kamala Harris).
 
 # Model
@@ -481,15 +483,31 @@ ggcorrplot(correlation_matrix, lab = TRUE, title = "Correlation Matrix")
 
 # Discussion {#sec-discussion}
 
-In this paper, we developed and implemented a predictive model to forecast the outcome of the 2024 U.S. Presidential election, focusing on both popular vote percentages and Electoral College results. The model incorporates polling data, demographic information, and state-specific effects.
+## What did we do?
 
-The model teaches us that state-level dynamics play a crucial role in determining the winner of U.S. Presidential elections. Even though Harris is expected to lead in the popular vote, Trump’s success in key battleground states suggests a victory in the Electoral College. An additional insight is that poll recency and pollster reliability significantly affect the accuracy of electoral predictions. By weighing recent and higher-quality polls more heavily, the model improves the robustness of its forecasts.
+This paper analyzes and predicts the 2024 U.S. presidential election outcomes through regression models based on polling data for two main candidates, Donald Trump and Kamala Harris. Using a state-by-state approach, it evaluates each candidate’s predicted percentage of support and calculates the anticipated electoral votes to provide an overall electoral projection. The model incorporates the predictor factors: PollScore, NumericGrade, SampleSize, State, and PollRecency.
 
-While the model adopts a linear regression framework for its simplicity and interpretability, this choice may limit its ability to capture more complex relationships among variables. Future iterations might benefit from exploring nonlinear models or advanced machine learning techniques, which could uncover patterns not readily observable through traditional methods.
+## What did we learn?
 
-One limitation of this model is that it depends entirely on polling data, which may not always capture late shifts in voter preferences or turnout variations. Furthermore, the model does not account for external factors like campaign events or last-minute developments, which can significantly influence electoral outcomes.
+This paper reveals the regional polarization in the U.S. and illustrates how strong state-based support can determine election outcomes, especially in battleground states. From this analysis, we observe that regions such as the Midwest and the South tend to favor conservative candidates, while the Northeast and West Coast are typically more supportive of liberal candidates. Trump’s predicted success in key battleground states, such as Pennsylvania and Michigan, leads to a victory in the Electoral College. Meanwhile, the difference in the predicted percentages for the popular vote is less than 2%. Although the popular vote is predicted to be nearly balanced, with a margin of less than 2% separating the candidates, the narrow margins in key battleground states demonstrate why every vote is so important. Small shifts in turnout or voter sentiment can truly change the overall outcome of the election, and thus the future of the United States, dramatically. A prime example of this took place in Georgia.
 
-Future research should aim to integrate alternative data sources, such as social media sentiment or economic indicators, to provide a more comprehensive view of voter preferences. More advanced machine learning techniques could also be explored to improve the accuracy of future election predictions.
+In 2020, Georgia turned blue in a presidential election for the first time since 1992 [@georgia2020]. A major factor in this shift was the influx of young, diverse individuals in the Atlanta suburban area. In Gwinnett County, the non-Hispanic white population decreased from 67% in 2000 to around 35% by 2020 [@georgiaturnedblue]. Mitt Romney, a Republican, had won Gwinnett County by 9 points in 2012. In 2020, it shifted to an 18-point win for Joe Biden. Additionally, there was a major campaign by Stacey Abrams to mobilize previously disengaged voters, particularly people of color [@georgiaturnedblue]. All of this led to Georgia becoming a swing state after 28 years of voting red. Biden received only 0.2% more of the vote than Trump in Georgia.
+
+## What are some weaknesses?
+
+One limitation is its reliance on polling data, which can be inherently biased due to sampling issues, response rates, and potential biases in who chooses to respond to polls. Moreover, as the election date approaches, polling data may fail to capture recent shifts in voter sentiment resulting from unforeseen events or major campaign developments. For example, last-minute political controversies or debates can alter public opinion quickly.
+
+For instance, a recent incident involving derogatory comments about Puerto Rico made at a Trump rally has rapidly influenced the views of Puerto Rican voters in Pennsylvania. Puerto Rican voters, who make up nearly half a million people in the state, have voiced anger and disapproval, with some even reversing their voting plans [@Hill2024]. WhatsApp groups, morning radio shows, and community discussions have amplified these sentiments, illustrating how quickly backlash can spread through influential networks, particularly in swing states [@Hill2024]. Our model predicts Trump will win Pennsylvania by a margin of 0.8%, which is less than the 3.7% of Pennsylvania's Population that Puerto Ricans make up [@USCensus2020]. Situations like these could easily cause Pennsylvania's 19 electoral votes to swing the other way.
+
+Another limitation is the assumption that past trends will remain consistent across elections, which does not account for the ongoing demographic and ideological shifts within states. For instance, the influx of highly educated individuals into certain states can shift voting patterns over time, as research indicates that Americans with a college degree or higher are more likely to vote for liberal candidates [@pew2016]. Should a state’s population of college-educated voters grow significantly, this change could lead to unexpected voting outcomes that our model might not fully capture.
+
+Additionally, the model excludes third-party candidates, who, while unlikely to win, often garner a small but meaningful percentage of votes. Independent candidates historically attract around 2-5% of the popular vote, diverting votes from major party candidates, which can be especially impactful in closely contested states. This factor may lead to underestimations in one candidate’s projected vote share if independents disproportionately draw support from one side.
+
+These limitations point to a larger issue: that forecasting an election relies on data subject to change and that unexpected events and demographic trends can disrupt otherwise reliable patterns.
+
+## What is left to learn? How should we proceed in the future?
+
+Future research could better the model by incorporating live data updates and adjusting for factors such as voter turnout projections and demographic shifts at the state level. For example, as states experience growth in college-educated residents or younger populations, these demographic factors may gradually influence overall voting patterns. A model that can adapt ro reflect these trends could improve predictive accuracy over time. Additionally, including third-party candidates in the model would provide a more well-rounded view of the vote breakdown, as these candidates can meaningfully impact the final distribution of votes between the two primary candidates. As previously mentioned, third-party candidates can capture a small but notable portion of votes, which can tilt tight races in battleground states. Future models could potentially account for this by assessing third-party candidates’ historical performance to estimate the effect on major candidates’ vote shares.
 
 \newpage
 
