@@ -6,7 +6,7 @@ author:
   - Deyi Kong
   - Rayan Awad Alim
 thanks: "Code and data are available at: [https://github.com/eeeee-cmd/US_Election/](https://github.com/eeeee-cmd/US_Election/)."
-date: today
+date: November 4, 2024
 date-format: long
 abstract: "This paper predicts the 2024 U.S. Presidential election. We utilizes linear regression model deploying polling data and demographic factors to predict both popular vote and Electoral College outcomes. The findings indicate a close race between Donald Trump and Kamala Harris, and we predict Trump will secure the Electoral College and Popular Vote due to key wins in tight races for the Battleground States. The results emphasize the role of state-level dynamics, particularly in Battleground states, in determining election outcomes."
 format: pdf
